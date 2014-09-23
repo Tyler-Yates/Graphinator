@@ -8,3 +8,7 @@ Graphinator is an easy-to-use visual learning tool for graphs. Users are able to
  - Is the graph a [tree](http://en.wikipedia.org/wiki/Tree_(graph_theory))?
 
 Graphinator allows users to add, move, and delete both vertices and connections in real-time with all relevant graph information updated instantaneously.
+<br>
+<br>
+## Origin
+Graphinator was originally conceived at [HackTX](http://hacktx.com/) 2012 by [Tyler Yates](https://github.com/Tyler-Yates), [Kevin Yeh](https://github.com/kyeah), and [Claudio Wilson](https://github.com/claudiowilson).
