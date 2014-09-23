@@ -1,10 +1,10 @@
 package visualization;
 
 import graph.Edge;
-import util.FileOperations;
 import graph.Graph;
 import graph.PropertyFinder;
 import graph.Vertex;
+import util.FileOperations;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +16,9 @@ import java.util.ArrayList;
 
 public class Drawer extends JPanel implements MouseMotionListener, MouseListener {
     private static final long serialVersionUID = 5174812665272092921L;
+
+    private static final double VERSION = 0.1;
+
     public static JFrame frame;
     public static Graph graph = new Graph();
     public static Vertex selectedVertex = null;
@@ -51,7 +54,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     public static short oldMode = 0;
 
     public Drawer() {
-        frame = new JFrame("Nodes");
+        frame = new JFrame("Graphinator v" + VERSION);
         frame.setVisible(true);
         oldWidth = 1024;
         oldHeight = 720;
@@ -91,22 +94,24 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         buttons.clear();
         int x = frame.getInsets().left;
         int y = frame.getInsets().top;
-        visualization.Button vertexButton = new visualization.Button((short) 0, frame.getWidth() - x - 200,
-                frame.getHeight() - y - 50, 100, 50);
+        visualization.Button vertexButton = new visualization.Button((short) 0,
+                frame.getWidth() - x - 200, frame.getHeight() - y - 50, 100, 50);
         vertexButton.setText("Vertex");
-        visualization.Button connectionButton = new visualization.Button((short) 1, frame.getWidth() - x - 100,
-                frame.getHeight() - y - 50, 100, 50);
+        visualization.Button connectionButton = new visualization.Button((short) 1,
+                frame.getWidth() - x - 100, frame.getHeight() - y - 50, 100, 50);
         connectionButton.setText("Connection");
-        visualization.Button removeButton = new visualization.Button((short) 2, frame.getWidth() - x - 300,
-                frame.getHeight() - y - 50, 100, 50);
+        visualization.Button removeButton = new visualization.Button((short) 2,
+                frame.getWidth() - x - 300, frame.getHeight() - y - 50, 100, 50);
         removeButton.setText("Remove");
         buttons.add(vertexButton);
         buttons.add(connectionButton);
         buttons.add(removeButton);
 
-        visualization.Button saveButton = new visualization.Button((short) 3, 0, frame.getHeight() - y - 50, 100, 50);
+        visualization.Button saveButton = new visualization.Button((short) 3, 0,
+                frame.getHeight() - y - 50, 100, 50);
         saveButton.setText("Save");
-        visualization.Button loadButton = new visualization.Button((short) 4, 100, frame.getHeight() - y - 50, 100, 50);
+        visualization.Button loadButton = new visualization.Button((short) 4, 100,
+                frame.getHeight() - y - 50, 100, 50);
         loadButton.setText("Load");
         buttons.add(saveButton);
         buttons.add(loadButton);
