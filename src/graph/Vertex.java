@@ -1,3 +1,7 @@
+package graph;
+
+import visualization.Drawer;
+
 import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;

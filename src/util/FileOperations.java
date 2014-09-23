@@ -1,3 +1,9 @@
+package util;
+
+import graph.Graph;
+import graph.Vertex;
+import visualization.Drawer;
+
 import javax.swing.*;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

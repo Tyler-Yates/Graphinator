@@ -1,3 +1,5 @@
+package visualization;
+
 import java.awt.*;
 
 public class InfoPanel {

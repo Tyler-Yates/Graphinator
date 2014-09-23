@@ -1,3 +1,11 @@
+package visualization;
+
+import graph.Edge;
+import util.FileOperations;
+import graph.Graph;
+import graph.PropertyFinder;
+import graph.Vertex;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -8,9 +16,9 @@ import java.util.ArrayList;
 
 public class Drawer extends JPanel implements MouseMotionListener, MouseListener {
     private static final long serialVersionUID = 5174812665272092921L;
-    static JFrame frame;
-    static Graph graph = new Graph();
-    static Vertex selectedVertex = null;
+    public static JFrame frame;
+    public static Graph graph = new Graph();
+    public static Vertex selectedVertex = null;
     static Vertex infoNode = null;
     static InfoPanel info = new InfoPanel();
 
@@ -28,8 +36,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     static int originalCanvasX, originalCanvasY;
     static int originalMouseX, originalMouseY;
 
-    static short mode = 0;
-    static ArrayList<Button> buttons = new ArrayList<Button>();
+    public static short mode = 0;
+    static ArrayList<visualization.Button> buttons = new ArrayList<visualization.Button>();
 
     static ArrayList<Edge> lines = new ArrayList<Edge>();
 
@@ -83,22 +91,22 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         buttons.clear();
         int x = frame.getInsets().left;
         int y = frame.getInsets().top;
-        Button vertexButton = new Button((short) 0, frame.getWidth() - x - 200,
+        visualization.Button vertexButton = new visualization.Button((short) 0, frame.getWidth() - x - 200,
                 frame.getHeight() - y - 50, 100, 50);
         vertexButton.setText("Vertex");
-        Button connectionButton = new Button((short) 1, frame.getWidth() - x - 100,
+        visualization.Button connectionButton = new visualization.Button((short) 1, frame.getWidth() - x - 100,
                 frame.getHeight() - y - 50, 100, 50);
         connectionButton.setText("Connection");
-        Button removeButton = new Button((short) 2, frame.getWidth() - x - 300,
+        visualization.Button removeButton = new visualization.Button((short) 2, frame.getWidth() - x - 300,
                 frame.getHeight() - y - 50, 100, 50);
         removeButton.setText("Remove");
         buttons.add(vertexButton);
         buttons.add(connectionButton);
         buttons.add(removeButton);
 
-        Button saveButton = new Button((short) 3, 0, frame.getHeight() - y - 50, 100, 50);
+        visualization.Button saveButton = new visualization.Button((short) 3, 0, frame.getHeight() - y - 50, 100, 50);
         saveButton.setText("Save");
-        Button loadButton = new Button((short) 4, 100, frame.getHeight() - y - 50, 100, 50);
+        visualization.Button loadButton = new visualization.Button((short) 4, 100, frame.getHeight() - y - 50, 100, 50);
         loadButton.setText("Load");
         buttons.add(saveButton);
         buttons.add(loadButton);
@@ -141,7 +149,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                 v.draw(g, canvasX, canvasY);
             }
 
-            for (Button b : buttons) {
+            for (visualization.Button b : buttons) {
                 b.draw(g);
             }
 
@@ -210,7 +218,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
     public static void initLines() {
         lines.clear();
-        for (Vertex v : graph.vertices) {
+        for (Vertex v : graph.getVertices()) {
             for (Vertex vv : v.getConnections()) {
                 Edge temp = new Edge(v, vv);
                 if (!lines.contains(temp)) {
@@ -258,7 +266,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
         if (e.getButton() == MouseEvent.BUTTON1) {
 
-            for (Button b : buttons) {
+            for (visualization.Button b : buttons) {
                 if (b.isWithin(x, y)) {
                     mode = b.getMode();
                     return;

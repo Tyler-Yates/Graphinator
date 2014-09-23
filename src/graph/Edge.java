@@ -1,3 +1,5 @@
+package graph;
+
 public class Edge implements Comparable<Edge> {
     private int sx, sy, tx, ty;
     private Vertex sv, tv;
