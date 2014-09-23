@@ -1,5 +1,7 @@
 package visualization;
 
+import util.MouseMode;
+
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
@@ -7,10 +9,10 @@ import java.awt.geom.Rectangle2D;
 
 public class Button {
     private int x, y, width, height;
-    private short mode = 0;
+    private MouseMode mode = MouseMode.VERTEX;
     private String text = "";
 
-    public Button(short m, int x, int y, int w, int h) {
+    public Button(MouseMode m, int x, int y, int w, int h) {
         mode = m;
         this.x = x;
         this.y = y;
@@ -69,7 +71,7 @@ public class Button {
         g.drawString(s, x + (width / 2 - w / 2), y);
     }
 
-    public short getMode() {
+    public MouseMode getMode() {
         return mode;
     }
 }

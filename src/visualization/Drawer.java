@@ -5,6 +5,7 @@ import graph.Graph;
 import graph.PropertyFinder;
 import graph.Vertex;
 import util.FileOperations;
+import util.MouseMode;
 
 import javax.swing.*;
 import java.awt.*;
@@ -39,8 +40,10 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     static int originalCanvasX, originalCanvasY;
     static int originalMouseX, originalMouseY;
 
-    public static short mode = 0;
-    static ArrayList<visualization.Button> buttons = new ArrayList<visualization.Button>();
+    public static MouseMode mode = MouseMode.VERTEX;
+    public static MouseMode oldMode = MouseMode.VERTEX;
+
+    static ArrayList<Button> buttons = new ArrayList<Button>();
 
     static ArrayList<Edge> lines = new ArrayList<Edge>();
 
@@ -51,7 +54,6 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
     static boolean isConnected = true;
     static boolean isTree = true;
-    public static short oldMode = 0;
 
     public Drawer() {
         frame = new JFrame("Graphinator v" + VERSION);
@@ -75,13 +77,13 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     }
 
     public static void buttonAction() {
-        if (mode == 3) {
+        if (mode == MouseMode.SAVE) {
             try {
                 FileOperations.saveFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else if (mode == 4) {
+        } else if (mode == MouseMode.LOAD) {
             try {
                 FileOperations.loadFile();
             } catch (Exception e) {
@@ -94,24 +96,22 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         buttons.clear();
         int x = frame.getInsets().left;
         int y = frame.getInsets().top;
-        visualization.Button vertexButton = new visualization.Button((short) 0,
-                frame.getWidth() - x - 200, frame.getHeight() - y - 50, 100, 50);
+        Button vertexButton = new Button(MouseMode.VERTEX, frame.getWidth() - x - 200,
+                frame.getHeight() - y - 50, 100, 50);
         vertexButton.setText("Vertex");
-        visualization.Button connectionButton = new visualization.Button((short) 1,
-                frame.getWidth() - x - 100, frame.getHeight() - y - 50, 100, 50);
+        Button connectionButton = new Button(MouseMode.CONNECTION, frame.getWidth() - x - 100,
+                frame.getHeight() - y - 50, 100, 50);
         connectionButton.setText("Connection");
-        visualization.Button removeButton = new visualization.Button((short) 2,
-                frame.getWidth() - x - 300, frame.getHeight() - y - 50, 100, 50);
+        Button removeButton = new Button(MouseMode.REMOVE, frame.getWidth() - x - 300,
+                frame.getHeight() - y - 50, 100, 50);
         removeButton.setText("Remove");
         buttons.add(vertexButton);
         buttons.add(connectionButton);
         buttons.add(removeButton);
 
-        visualization.Button saveButton = new visualization.Button((short) 3, 0,
-                frame.getHeight() - y - 50, 100, 50);
+        Button saveButton = new Button(MouseMode.SAVE, 0, frame.getHeight() - y - 50, 100, 50);
         saveButton.setText("Save");
-        visualization.Button loadButton = new visualization.Button((short) 4, 100,
-                frame.getHeight() - y - 50, 100, 50);
+        Button loadButton = new Button(MouseMode.LOAD, 100, frame.getHeight() - y - 50, 100, 50);
         loadButton.setText("Load");
         buttons.add(saveButton);
         buttons.add(loadButton);
@@ -134,7 +134,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             g.setColor(Color.white);
 
 
-            if (mode == 1 && selectedVertex != null) {
+            if (mode == MouseMode.CONNECTION && selectedVertex != null) {
                 g.drawLine(selectedVertex.getX() + canvasX, selectedVertex.getY() + canvasY,
                         mouseX, mouseY);
             }
@@ -154,7 +154,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                 v.draw(g, canvasX, canvasY);
             }
 
-            for (visualization.Button b : buttons) {
+            for (Button b : buttons) {
                 b.draw(g);
             }
 
@@ -213,7 +213,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             }
         }
 
-        if (mode == 0) {
+        if (mode == MouseMode.VERTEX) {
             if (selectedVertex != null) {
                 info.setPosition(x, y);
                 selectedVertex.setPosition(x - canvasX, y - canvasY);
@@ -271,15 +271,14 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
         if (e.getButton() == MouseEvent.BUTTON1) {
 
-            for (visualization.Button b : buttons) {
+            for (Button b : buttons) {
                 if (b.isWithin(x, y)) {
                     mode = b.getMode();
                     return;
                 }
             }
 
-            if (mode == 0)//VertexMode
-            {
+            if (mode == MouseMode.VERTEX) {
                 for (int i = 0; i < graph.vertexCount(); i++) {
                     Vertex v = graph.getVertex(i);
                     double distance = Math.sqrt(Math.pow(x - canvasX - v.getX(),
@@ -302,8 +301,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                 temp.initialize();
                 graph.addVertex(temp);
                 checkConnected();
-            } else if (mode == 1)//Connection mode
-            {
+            } else if (mode == MouseMode.CONNECTION) {
                 for (int i = 0; i < graph.vertexCount(); i++) {
                     Vertex v = graph.getVertex(i);
                     double distance = Math.sqrt(Math.pow(x - canvasX - v.getX(),
@@ -327,8 +325,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                     selectedVertex.unselect();
                     selectedVertex = null;
                 }
-            } else if (mode == 2)//Remove mode
-            {
+            } else if (mode == MouseMode.REMOVE) {
                 for (int i = 0; i < graph.vertexCount(); i++) {
                     Vertex v = graph.getVertex(i);
                     double distance = Math.sqrt(Math.pow(x - canvasX - v.getX(),
@@ -394,12 +391,12 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (dragged) {
-                if (mode == 0) {
+                if (mode == MouseMode.VERTEX) {
                     if (selectedVertex != null) {
                         selectedVertex.unselect();
                     }
                     selectedVertex = null;
-                } else if (mode == 1) {
+                } else if (mode == MouseMode.CONNECTION) {
                     if (selectedVertex != null) {
                         for (int i = 0; i < graph.vertexCount(); i++) {
                             Vertex v = graph.getVertex(i);
