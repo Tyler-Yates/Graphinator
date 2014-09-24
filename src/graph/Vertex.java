@@ -29,6 +29,13 @@ public class Vertex implements Comparable<Vertex>, Serializable {
         drawY = dy;
     }
 
+    public Vertex(int id, int dx, int dy) {
+        this.id = id;
+        ID = id;
+        drawX = dx;
+        drawY = dy;
+    }
+
     public void select() {
         selected = true;
     }

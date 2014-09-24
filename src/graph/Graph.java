@@ -32,6 +32,15 @@ public class Graph {
         return null;
     }
 
+    public Vertex getVertexByID(int id) {
+        for (Vertex vertex : vertices) {
+            if (vertex.getID() == id) {
+                return vertex;
+            }
+        }
+        return null;
+    }
+
     public boolean addVertex(Vertex a) {
         vertices.add(a);
         return true;
