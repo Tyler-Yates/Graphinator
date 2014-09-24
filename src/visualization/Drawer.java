@@ -27,8 +27,6 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
     static int oldWidth, oldHeight;
 
-    static long timer = System.currentTimeMillis() - 1000;
-
     static long dragTimer = -1;
 
     static int canvasX, canvasY;
@@ -102,62 +100,55 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
     public void paintComponent(Graphics g) {
         g.setFont(drawFont);
-        //frame.setTitle(dragged+" "+dragTimer);
-        if (System.currentTimeMillis() - timer >= 32) {
-            timer = System.currentTimeMillis();
+        if (frame.getWidth() != oldWidth || frame.getHeight() != oldHeight) {
+            oldWidth = frame.getWidth();
+            oldHeight = frame.getHeight();
+            initButtons();
+        }
+        g.setColor(frame.getBackground());
+        g.fillRect(0, 0, frame.getWidth(), frame.getHeight());
 
-            if (frame.getWidth() != oldWidth || frame.getHeight() != oldHeight) {
-                oldWidth = frame.getWidth();
-                oldHeight = frame.getHeight();
-                initButtons();
-            }
-            g.setColor(frame.getBackground());
-            g.fillRect(0, 0, frame.getWidth(), frame.getHeight());
-
-            g.setColor(Color.white);
+        g.setColor(Color.white);
 
 
-            if (mode == MouseMode.CONNECTION && selectedVertex != null) {
-                g.drawLine(selectedVertex.getX() + canvasX, selectedVertex.getY() + canvasY,
-                        mouseX, mouseY);
-            }
-
-            for (Vertex v : graph.getVertices()) {
-                if (!v.isSelected()) {
-                    v.drawConnections(g, canvasX, canvasY);
-                }
-            }
-            if (selectedVertex != null) {
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setStroke(new BasicStroke(2.5f));
-                selectedVertex.drawConnections(g, canvasX, canvasY);
-                g2.setStroke(new BasicStroke(1f));
-            }
-            for (Vertex v : graph.getVertices()) {
-                v.draw(g, canvasX, canvasY);
-            }
-
-            for (Button b : buttons) {
-                b.draw(g);
-            }
-
-            if (graph != null && graph.getVertices() != null) {
-                g.setColor(frame.getBackground());
-                g.fillRect(0, 0, 200, 150);
-                g.setColor(Color.white);
-                g.drawString("Number of Vertices: " + graph.vertexCount(), 10, 20);
-                g.drawString("Number of Connections: " + graph.connectionCount() / 2, 10, 40);
-                g.drawString("Number of Colors: " + Vertex.getMaxColor(), 10, 60);
-                g.drawString("Maximum Degree: " + PropertyFinder.maxDegree(graph), 10, 80);
-                g.drawString("Bipartite: " + PropertyFinder.isBipartite(), 10, 100);
-                g.drawString("Connected: " + isConnected, 10, 120);
-                g.drawString("Tree: " + isTree, 10, 140);
-            }
-
-            info.draw(g);
+        if (mode == MouseMode.CONNECTION && selectedVertex != null) {
+            g.drawLine(selectedVertex.getX() + canvasX, selectedVertex.getY() + canvasY, mouseX,
+                    mouseY);
         }
 
-        repaint();
+        for (Vertex v : graph.getVertices()) {
+            if (!v.isSelected()) {
+                v.drawConnections(g, canvasX, canvasY);
+            }
+        }
+        if (selectedVertex != null) {
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setStroke(new BasicStroke(2.5f));
+            selectedVertex.drawConnections(g, canvasX, canvasY);
+            g2.setStroke(new BasicStroke(1f));
+        }
+        for (Vertex v : graph.getVertices()) {
+            v.draw(g, canvasX, canvasY);
+        }
+
+        for (Button b : buttons) {
+            b.draw(g);
+        }
+
+        if (graph != null && graph.getVertices() != null) {
+            g.setColor(frame.getBackground());
+            g.fillRect(0, 0, 200, 150);
+            g.setColor(Color.white);
+            g.drawString("Number of Vertices: " + graph.vertexCount(), 10, 20);
+            g.drawString("Number of Connections: " + graph.connectionCount() / 2, 10, 40);
+            g.drawString("Number of Colors: " + Vertex.getMaxColor(), 10, 60);
+            g.drawString("Maximum Degree: " + PropertyFinder.maxDegree(graph), 10, 80);
+            g.drawString("Bipartite: " + PropertyFinder.isBipartite(), 10, 100);
+            g.drawString("Connected: " + isConnected, 10, 120);
+            g.drawString("Tree: " + isTree, 10, 140);
+        }
+
+        info.draw(g);
     }
 
     private static void resetColor() {
@@ -202,6 +193,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                 selectedVertex.setPosition(x - canvasX, y - canvasY);
             }
         }
+
+        repaint();
     }
 
     public static void initLines() {
@@ -239,6 +232,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             }
         }
         infoNode = null;
+
+        repaint();
     }
 
     public void mouseClicked(MouseEvent arg0) {
@@ -365,6 +360,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             originalCanvasY = canvasY;
             draggingCanvas = true;
         }
+
+        repaint();
     }
 
     private static void setColor() {
@@ -411,6 +408,9 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                                     selectedVertex.unselect();
                                     selectedVertex = null;
                                     setColor();
+
+                                    repaint();
+
                                     return;
                                 } else {
                                     resetColor();
@@ -421,6 +421,9 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                                     infoNode = v;
                                     selectedVertex = null;
                                     setColor();
+
+                                    repaint();
+
                                     return;
                                 }
                             }
@@ -438,6 +441,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         } else if (e.getButton() == MouseEvent.BUTTON3) {
             draggingCanvas = false;
         }
+
+        repaint();
     }
 
     public static void reset() {
