@@ -4,7 +4,7 @@ import graph.Edge;
 import graph.Graph;
 import graph.PropertyFinder;
 import graph.Vertex;
-import util.FileOperations;
+import util.Action;
 import util.MouseMode;
 
 import javax.swing.*;
@@ -12,7 +12,6 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class Drawer extends JPanel implements MouseMotionListener, MouseListener {
@@ -41,7 +40,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     static int originalMouseX, originalMouseY;
 
     public static MouseMode mode = MouseMode.VERTEX;
-    public static MouseMode oldMode = MouseMode.VERTEX;
+    private static Button selectedButton;
 
     static ArrayList<Button> buttons = new ArrayList<Button>();
 
@@ -50,7 +49,6 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     static boolean dragged = false;
 
     static Font drawFont = null;
-    static boolean initFont = false;
 
     static boolean isConnected = true;
     static boolean isTree = true;
@@ -76,43 +74,28 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         drawFont = new Font("Arial", Font.BOLD, 16);
     }
 
-    public static void buttonAction() {
-        if (mode == MouseMode.SAVE) {
-            try {
-                FileOperations.saveFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else if (mode == MouseMode.LOAD) {
-            try {
-                FileOperations.loadFile();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     public static void initButtons() {
         buttons.clear();
         int x = frame.getInsets().left;
         int y = frame.getInsets().top;
-        Button vertexButton = new Button(MouseMode.VERTEX, frame.getWidth() - x - 200,
-                frame.getHeight() - y - 50, 100, 50);
-        vertexButton.setText("Vertex");
-        Button connectionButton = new Button(MouseMode.CONNECTION, frame.getWidth() - x - 100,
-                frame.getHeight() - y - 50, 100, 50);
-        connectionButton.setText("Connection");
-        Button removeButton = new Button(MouseMode.REMOVE, frame.getWidth() - x - 300,
-                frame.getHeight() - y - 50, 100, 50);
-        removeButton.setText("Remove");
+        ModeButton vertexButton = new ModeButton(MouseMode.VERTEX, frame.getWidth() - x - 200,
+                frame.getHeight() - y - 50, 100, 50, "Vertex");
+        //The vertex button starts out as the selected button
+        selectedButton = vertexButton;
+        vertexButton.setButtonState(ButtonState.SELECTED);
+        ModeButton connectionButton = new ModeButton(MouseMode.CONNECTION,
+                frame.getWidth() - x - 100, frame.getHeight() - y - 50, 100, 50, "Connection");
+        ModeButton removeButton = new ModeButton(MouseMode.REMOVE, frame.getWidth() - x - 300,
+                frame.getHeight() - y - 50, 100, 50, "Remove");
+
         buttons.add(vertexButton);
         buttons.add(connectionButton);
         buttons.add(removeButton);
 
-        Button saveButton = new Button(MouseMode.SAVE, 0, frame.getHeight() - y - 50, 100, 50);
-        saveButton.setText("Save");
-        Button loadButton = new Button(MouseMode.LOAD, 100, frame.getHeight() - y - 50, 100, 50);
-        loadButton.setText("Load");
+        ActionButton saveButton = new ActionButton(0, frame.getHeight() - y - 50, 100, 50,
+                "Save", Action.SAVE);
+        ActionButton loadButton = new ActionButton(100, frame.getHeight() - y - 50, 100, 50,
+                "Load", Action.LOAD);
         buttons.add(saveButton);
         buttons.add(loadButton);
     }
@@ -237,6 +220,14 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         int x = e.getX() - frame.getInsets().left;
         int y = e.getY() - frame.getInsets().top;
 
+        for (Button button : buttons) {
+            if (button.getButtonState() != ButtonState.SELECTED && button.contains(x, y)) {
+                button.setButtonState(ButtonState.HOVER);
+            } else if (button.getButtonState() == ButtonState.HOVER) {
+                button.setButtonState(ButtonState.NORMAL);
+            }
+        }
+
         for (int i = 0; i < graph.vertexCount(); i++) {
             Vertex v = graph.getVertex(i);
             double distance = Math.sqrt(Math.pow(x - canvasX - v.getX(),
@@ -251,15 +242,12 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     }
 
     public void mouseClicked(MouseEvent arg0) {
-
     }
 
     public void mouseEntered(MouseEvent arg0) {
-
     }
 
     public void mouseExited(MouseEvent arg0) {
-
     }
 
     public void mousePressed(MouseEvent e) {
@@ -270,11 +258,22 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         mouseY = y;
 
         if (e.getButton() == MouseEvent.BUTTON1) {
+            for (Button button : buttons) {
+                if (button.contains(x, y)) {
+                    //Only ModeButtons should be selected
+                    if (button instanceof ModeButton) {
+                        if (selectedButton != null) {
+                            selectedButton.setButtonState(ButtonState.NORMAL);
+                        }
+                        button.setButtonState(ButtonState.SELECTED);
+                        selectedButton = button;
+                    }
 
-            for (Button b : buttons) {
-                if (b.isWithin(x, y)) {
-                    mode = b.getMode();
-                    return;
+                    try {
+                        button.perform();
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
                 }
             }
 
@@ -343,8 +342,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
                 Edge closestEdge = null;
                 double closestDistance = Double.MAX_VALUE;
-                for (int i = 0; i < lines.size(); i++) {
-                    Edge temp = lines.get(i);
+                for (Edge temp : lines) {
                     double dist = temp.distance(x - canvasX, y - canvasY);
                     if (dist < closestDistance) {
                         closestDistance = dist;

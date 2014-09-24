@@ -35,7 +35,6 @@ public class FileOperations {
                 output.close();
             }
         }
-        Drawer.mode = Drawer.oldMode;
     }
 
     public static void loadFile() throws IOException, ClassNotFoundException {
@@ -56,6 +55,5 @@ public class FileOperations {
                 }
             }
         }
-        Drawer.mode = Drawer.oldMode;
     }
 }
