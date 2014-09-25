@@ -118,17 +118,16 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                     mouseY);
         }
 
-        for (Vertex v : graph.getVertices()) {
-            if (!v.isSelected()) {
-                v.drawConnections(g, canvasX, canvasY);
-            }
+        for (Edge edge : lines) {
+            edge.paint(g);
         }
-        if (selectedVertex != null) {
+
+        /*if (selectedVertex != null) {
             Graphics2D g2 = (Graphics2D) g;
             g2.setStroke(new BasicStroke(2.5f));
             selectedVertex.drawConnections(g, canvasX, canvasY);
             g2.setStroke(new BasicStroke(1f));
-        }
+        }*/
         for (Vertex v : graph.getVertices()) {
             v.draw(g, canvasX, canvasY);
         }
@@ -202,7 +201,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     public static void initLines() {
         lines.clear();
         for (Vertex v : graph.getVertices()) {
-            for (Vertex vv : v.getConnections()) {
+            for (Vertex vv : v.getNeighbors()) {
                 Edge temp = new Edge(v, vv);
                 if (!lines.contains(temp)) {
                     lines.add(temp);
@@ -220,6 +219,17 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                 button.setButtonState(ButtonState.HOVER);
             } else if (button.getButtonState() == ButtonState.HOVER) {
                 button.setButtonState(ButtonState.NORMAL);
+            }
+        }
+
+        // highlight any edges that are within the removal range
+        if (mode == MouseMode.REMOVE) {
+            for (Edge edge : lines) {
+                if (edge.distance(x, y) < REMOVAL_DISTANCE) {
+                    edge.select();
+                } else {
+                    edge.deselect();
+                }
             }
         }
 
@@ -327,7 +337,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                     double distance = Math.sqrt(Math.pow(x - canvasX - v.getX(),
                             2) + Math.pow(y - canvasY - v.getY(), 2));
                     if (distance < Vertex.getRadius()) {
-                        for (Vertex temp : v.getConnections()) {
+                        for (Vertex temp : v.getNeighbors()) {
                             temp.removeConnection(v);
                         }
                         graph.removeVertex(v);
@@ -337,21 +347,19 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                     }
                 }
 
-                Edge closestEdge = null;
-                double closestDistance = Double.MAX_VALUE;
-                for (Edge temp : lines) {
-                    double dist = temp.distance(x - canvasX, y - canvasY);
-                    if (dist < closestDistance) {
-                        closestDistance = dist;
-                        closestEdge = temp;
+                for (int i=0; i<lines.size(); i++) {
+                    final Edge edge = lines.get(i);
+
+                    double dist = edge.distance(x - canvasX, y - canvasY);
+                    if (dist < REMOVAL_DISTANCE) {
+                        edge.getStart().removeConnection(edge);
+                        edge.getEnd().removeConnection(edge);
+                        lines.remove(i);
+                        resetColor();
+                        setColor();
+                        checkConnected();
+                        i--;
                     }
-                }
-                if (closestDistance < REMOVAL_DISTANCE && closestEdge != null) {
-                    closestEdge.removeConnection();
-                    lines.remove(closestEdge);
-                    resetColor();
-                    setColor();
-                    checkConnected();
                 }
             }
 
@@ -418,7 +426,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                                 } else {
                                     resetColor();
                                     lines.add(new Edge(v, selectedVertex));
-                                    selectedVertex.addConnection(v, true);
+                                    addConnection(selectedVertex, v);
+                                    addConnection(v, selectedVertex);
                                     selectedVertex.unselect();
                                     info.setPosition(x, y);
                                     infoNode = v;
@@ -460,5 +469,11 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         resetColor();
         setColor();
         checkConnected();
+    }
+
+    public static void addConnection(Vertex start, Vertex end) {
+        final Edge edge = new Edge(start, end);
+        lines.add(edge);
+        start.addConnection(edge);
     }
 }

@@ -1,6 +1,8 @@
 package graph;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class PropertyFinder {
@@ -34,7 +36,7 @@ public class PropertyFinder {
             return true;
         }
 
-        ArrayList<Vertex> visited = new ArrayList<Vertex>();
+        final Set<Vertex> visited = new HashSet<Vertex>();
         Vertex v;
         v = g.getVertex(0);
         connectedH(visited, v);
@@ -42,13 +44,13 @@ public class PropertyFinder {
         return visited.size() == g.vertexCount();
     }
 
-    public static void connectedH(ArrayList<Vertex> visited, Vertex v) {
+    public static void connectedH(Set<Vertex> visited, Vertex v) {
         if (visited.contains(v)) {
             return;
         }
 
         visited.add(v);
-        for (Vertex temp : v.getConnections()) {
+        for (Vertex temp : v.getNeighbors()) {
             connectedH(visited, temp);
         }
 
@@ -76,7 +78,7 @@ public class PropertyFinder {
             return;
         }
         if (v == null) {
-            for (Vertex temp : original.getConnections()) {
+            for (Vertex temp : original.getNeighbors()) {
                 cycleExists(original, original, temp, visited);
             }
         } else if (v.equals(original)) {
@@ -86,7 +88,7 @@ public class PropertyFinder {
             return;
         } else {
             visited.add(v);
-            for (Vertex temp : v.getConnections()) {
+            for (Vertex temp : v.getNeighbors()) {
                 if (!temp.equals(parent)) {
                     cycleExists(original, v, temp, visited);
                 }

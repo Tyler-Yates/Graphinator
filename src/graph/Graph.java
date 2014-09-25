@@ -69,7 +69,7 @@ public class Graph {
         ArrayList<Circuit> circuits = new ArrayList<Circuit>();
 
 
-        for (Vertex temp : v.getConnections()) {
+        for (Vertex temp : v.getNeighbors()) {
             ArrayList<Edge> connections = new ArrayList<Edge>();
             connections.add(new Edge(v, temp));
             Circuit c = new Circuit();
@@ -83,12 +83,8 @@ public class Graph {
             ArrayList<Edge> connections, ArrayList<Circuit> ans) {
         //System.out.println(current+" "+connections);
         currentPath.addVertex(current);
-        try {
-            //Thread.sleep(1000);
-        } catch (Exception e) {
-        }
         outer:
-        for (Vertex v : current.getConnections()) {
+        for (Vertex v : current.getNeighbors()) {
             Edge newConnect = new Edge(current, v);
             for (Edge e : connections) {
                 if (e.equals(newConnect)) {
@@ -103,6 +99,5 @@ public class Graph {
                 findCircuitsHelper(v, original, currentPath, connections, ans);
             }
         }
-        return;
     }
 }

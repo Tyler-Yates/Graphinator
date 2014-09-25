@@ -1,47 +1,71 @@
 package graph;
 
+import java.awt.*;
 import java.awt.geom.Line2D;
 
 public class Edge implements Comparable<Edge> {
-    private Line2D line;
-    private Vertex vertex1, vertex2;
+    private Vertex start, end;
+    private boolean selected;
 
     public Edge(Vertex start, Vertex end) {
-        vertex1 = start;
-        vertex2 = end;
-
-        line = new Line2D.Double(start.getX(), start.getY(), end.getX(), end.getY());
+        this.start = start;
+        this.end = end;
     }
 
     public double distance(int mx, int my) {
+        final Line2D line = new Line2D.Double(start.getX(), start.getY(), end.getX(), end.getY());
         return line.ptSegDist(mx, my);
     }
 
     public void removeConnection() {
-        if (vertex1 != null) {
-            vertex1.removeConnection(vertex2);
+        if (start != null) {
+            start.removeConnection(end);
         }
-        if (vertex2 != null) {
-            vertex2.removeConnection(vertex1);
+        if (end != null) {
+            end.removeConnection(start);
         }
     }
 
     public boolean equals(Edge e) {
-        return (e.vertex1 == vertex1 && e.vertex2 == vertex2) || (e.vertex1 == vertex2 && e
-                .vertex2 == vertex1);
+        return (e.start == start && e.end == end) || (e.start == end && e.end == start);
     }
 
     public String toString() {
-        return vertex1 + " " + vertex2;
+        return start + " " + end;
     }
 
     public int compareTo(Edge e) {
-        boolean bool = (e.vertex1 == vertex1 && e.vertex2 == vertex2) || (e.vertex1 == vertex2 &&
-                e.vertex2 == vertex1);
+        boolean bool = (e.start == start && e.end == end) || (e.start == end && e.end == start);
         if (bool) {
             return 0;
         } else {
             return 1;
         }
+    }
+
+    public void select() {
+        selected = true;
+    }
+
+    public void deselect() {
+        selected = false;
+    }
+
+    public void paint(Graphics g) {
+        if (selected) {
+            g.setColor(Color.RED);
+        } else {
+            g.setColor(Color.WHITE);
+        }
+
+        g.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
+    }
+
+    public Vertex getEnd() {
+        return end;
+    }
+
+    public Vertex getStart() {
+        return start;
     }
 }

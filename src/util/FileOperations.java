@@ -49,7 +49,7 @@ public class FileOperations {
                     }
 
                     printWriter.print(vertex.getID() + " ");
-                    for (Vertex connected : vertex.getConnections()) {
+                    for (Vertex connected : vertex.getNeighbors()) {
                         printWriter.print(connected.getID() + " ");
                     }
                     printWriter.println();
@@ -129,7 +129,7 @@ public class FileOperations {
                                     throw new MalformedGraphException("Invalid connection: " +
                                             "vertex does not exist");
                                 }
-                                vertex.addConnection(otherVertex, false);
+                                Drawer.addConnection(vertex, otherVertex);
                             }
                         }
                     }

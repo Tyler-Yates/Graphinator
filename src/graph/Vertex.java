@@ -17,7 +17,7 @@ public class Vertex implements Comparable<Vertex>, Serializable {
     private static int ID = 0;
     private static int maxColor = 1;
     private static ArrayList<Color> colors = null;
-    private HashSet<Vertex> connections = new HashSet<Vertex>();
+    private HashSet<Edge> connections = new HashSet<Edge>();
     private ArrayList<Integer> invalidColors = new ArrayList<Integer>();
 
     private boolean selected = false;
@@ -65,14 +65,11 @@ public class Vertex implements Comparable<Vertex>, Serializable {
         return getID() == other.getID();
     }
 
-    public void addConnection(Vertex other, boolean initial) {
-        if (other == null) {
+    public void addConnection(Edge connection) {
+        if (connection == null) {
             return;
         }
-        connections.add(other);
-        if (initial) {
-            other.addConnection(this, false);
-        }
+        connections.add(connection);
     }
 
     public void initialize() {
@@ -82,7 +79,7 @@ public class Vertex implements Comparable<Vertex>, Serializable {
 
         color = 1;
 
-        for (Vertex v : connections) {
+        for (Vertex v : getNeighbors()) {
             v.chooseColor();
         }
     }
@@ -103,7 +100,7 @@ public class Vertex implements Comparable<Vertex>, Serializable {
             return;
         }
 
-        for (Vertex v : connections) {
+        for (Vertex v : getNeighbors()) {
             int neighborColor = v.getColor();
             invalidColors.add(neighborColor);
         }
@@ -116,13 +113,22 @@ public class Vertex implements Comparable<Vertex>, Serializable {
             k++;
         }
 
-        for (Vertex v : connections) {
+        for (Vertex v : getNeighbors()) {
             v.chooseColor();
         }
     }
 
-    public HashSet<Vertex> getConnections() {
+    public HashSet<Edge> getConnections() {
         return connections;
+    }
+
+    public HashSet<Vertex> getNeighbors() {
+        final HashSet<Vertex> vertexes = new HashSet<Vertex>();
+        for (Edge edge : connections) {
+            vertexes.add(edge.getEnd());
+        }
+
+        return vertexes;
     }
 
     public static void initColors() {
@@ -187,19 +193,6 @@ public class Vertex implements Comparable<Vertex>, Serializable {
         g.drawOval(drawX - radius / 2 + cX, drawY - radius / 2 + cY, radius, radius);
     }
 
-    public void drawConnections(Graphics g, int cX, int cY) {
-        if (selected) {
-            g.setColor(Color.red);
-        } else {
-            g.setColor(Color.white);
-        }
-        for (Vertex v : connections) {
-            if (Drawer.selectedVertex == null || !Drawer.selectedVertex.equals(v)) {
-                g.drawLine(drawX + cX, drawY + cY, v.getX() + cX, v.getY() + cY);
-            }
-        }
-    }
-
     public int numberConnections() {
         return connections.size();
     }
@@ -218,11 +211,17 @@ public class Vertex implements Comparable<Vertex>, Serializable {
     }
 
     public void removeConnection(Vertex other) {
-        connections.remove(other);
+        final Edge removal = new Edge(this, other);
+        connections.remove(removal);
+    }
+
+    public void removeConnection(Edge connection) {
+        connections.remove(connection);
     }
 
     public boolean isNeighbor(Vertex other) {
-        return connections.contains(other);
+        final Edge check = new Edge(this, other);
+        return connections.contains(check);
     }
 
     @Override
