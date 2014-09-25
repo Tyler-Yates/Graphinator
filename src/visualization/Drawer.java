@@ -37,6 +37,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     static int originalCanvasX, originalCanvasY;
     static int originalMouseX, originalMouseY;
 
+    private static final double REMOVAL_DISTANCE = 7.5;
+
     public static MouseMode mode = MouseMode.VERTEX;
     private static Button selectedButton;
 
@@ -344,8 +346,9 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                         closestEdge = temp;
                     }
                 }
-                if (closestDistance < 5.0) {
+                if (closestDistance < REMOVAL_DISTANCE && closestEdge != null) {
                     closestEdge.removeConnection();
+                    lines.remove(closestEdge);
                     resetColor();
                     setColor();
                     checkConnected();

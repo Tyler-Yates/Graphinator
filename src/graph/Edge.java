@@ -1,7 +1,10 @@
 package graph;
 
+import java.awt.geom.Line2D;
+
 public class Edge implements Comparable<Edge> {
     private int sx, sy, tx, ty;
+    private Line2D line;
     private Vertex sv, tv;
 
     public Edge(Vertex start, Vertex end) {
@@ -11,11 +14,14 @@ public class Edge implements Comparable<Edge> {
         ty = end.getY();
         sv = start;
         tv = end;
+
+        line = new Line2D.Double(start.getX(), start.getY(), end.getX(), end.getY());
     }
 
     public double distance(int mx, int my) {
-        double hypotenuse = Math.sqrt(Math.pow(tx - sx, 2) + Math.pow(ty - sy, 2));
-        return Math.abs((mx - sx) * (ty - sy) - (my - sy) * (tx - sx)) / hypotenuse;
+        return line.ptSegDist(mx, my);
+        //double hypotenuse = Math.sqrt(Math.pow(tx - sx, 2) + Math.pow(ty - sy, 2));
+        //return Math.abs((mx - sx) * (ty - sy) - (my - sy) * (tx - sx)) / hypotenuse;
     }
 
     public void removeConnection() {
