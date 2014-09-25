@@ -87,7 +87,7 @@ public class FileOperations {
                     }
 
                     // create each vertex from its definition
-                    while (Drawer.graph.getVertices().size() < numVertices) {
+                    while (Drawer.graph.getVertices().size() < numVertices && input.hasNext()) {
                         final String line = input.nextLine();
                         if (!line.startsWith("#")) {
                             final String[] sections = line.split(" ");
@@ -104,6 +104,11 @@ public class FileOperations {
                         }
                     }
 
+                    // ensure we have the correct number of vertex definitions
+                    if (Drawer.graph.getVertices().size() < numVertices) {
+                        throw new MalformedGraphException("Missing vertex definition(s)");
+                    }
+
                     // create the connections between vertices
                     while (input.hasNext()) {
                         final String line = input.nextLine();
@@ -112,10 +117,19 @@ public class FileOperations {
 
                             final int id = Integer.parseInt(sections[0]);
                             final Vertex vertex = Drawer.graph.getVertexByID(id);
+                            if (vertex == null) {
+                                throw new MalformedGraphException("Invalid connection: vertex " +
+                                        "does not exist");
+                            }
 
                             for (int i = 1; i < sections.length; i++) {
                                 final int otherID = Integer.parseInt(sections[i]);
-                                vertex.addConnection(Drawer.graph.getVertexByID(otherID), false);
+                                final Vertex otherVertex = Drawer.graph.getVertexByID(otherID);
+                                if (otherVertex == null) {
+                                    throw new MalformedGraphException("Invalid connection: " +
+                                            "vertex does not exist");
+                                }
+                                vertex.addConnection(otherVertex, false);
                             }
                         }
                     }
