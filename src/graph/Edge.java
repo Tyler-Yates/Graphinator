@@ -3,46 +3,41 @@ package graph;
 import java.awt.geom.Line2D;
 
 public class Edge implements Comparable<Edge> {
-    private int sx, sy, tx, ty;
     private Line2D line;
-    private Vertex sv, tv;
+    private Vertex vertex1, vertex2;
 
     public Edge(Vertex start, Vertex end) {
-        sx = start.getX();
-        sy = start.getY();
-        tx = end.getX();
-        ty = end.getY();
-        sv = start;
-        tv = end;
+        vertex1 = start;
+        vertex2 = end;
 
         line = new Line2D.Double(start.getX(), start.getY(), end.getX(), end.getY());
     }
 
     public double distance(int mx, int my) {
         return line.ptSegDist(mx, my);
-        //double hypotenuse = Math.sqrt(Math.pow(tx - sx, 2) + Math.pow(ty - sy, 2));
-        //return Math.abs((mx - sx) * (ty - sy) - (my - sy) * (tx - sx)) / hypotenuse;
     }
 
     public void removeConnection() {
-        if (sv != null) {
-            sv.removeConnection(tv);
+        if (vertex1 != null) {
+            vertex1.removeConnection(vertex2);
         }
-        if (tv != null) {
-            tv.removeConnection(sv);
+        if (vertex2 != null) {
+            vertex2.removeConnection(vertex1);
         }
     }
 
     public boolean equals(Edge e) {
-        return (e.sv == sv && e.tv == tv) || (e.sv == tv && e.tv == sv);
+        return (e.vertex1 == vertex1 && e.vertex2 == vertex2) || (e.vertex1 == vertex2 && e
+                .vertex2 == vertex1);
     }
 
     public String toString() {
-        return "" + sv + " " + tv;
+        return vertex1 + " " + vertex2;
     }
 
     public int compareTo(Edge e) {
-        boolean bool = (e.sv == sv && e.tv == tv) || (e.sv == tv && e.tv == sv);
+        boolean bool = (e.vertex1 == vertex1 && e.vertex2 == vertex2) || (e.vertex1 == vertex2 &&
+                e.vertex2 == vertex1);
         if (bool) {
             return 0;
         } else {
