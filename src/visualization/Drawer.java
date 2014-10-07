@@ -9,6 +9,8 @@ import util.MouseMode;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -24,8 +26,6 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     public static Vertex selectedVertex = null;
     static Vertex infoNode = null;
     static InfoPanel info = new InfoPanel();
-
-    static int oldWidth, oldHeight;
 
     static long dragTimer = -1;
 
@@ -56,13 +56,19 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     public Drawer() {
         frame = new JFrame("Graphinator v" + VERSION);
         frame.setVisible(true);
-        oldWidth = 1024;
-        oldHeight = 720;
-        frame.setSize(oldWidth, oldHeight);
+        frame.setSize(1024, 768);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setBackground(Color.black);
         frame.addMouseMotionListener(this);
         frame.addMouseListener(this);
+        frame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
+                initButtons();
+                repaint();
+            }
+        });
         frame.add(this);
     }
 
@@ -102,11 +108,6 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
     public void paintComponent(Graphics g) {
         g.setFont(drawFont);
-        if (frame.getWidth() != oldWidth || frame.getHeight() != oldHeight) {
-            oldWidth = frame.getWidth();
-            oldHeight = frame.getHeight();
-            initButtons();
-        }
         g.setColor(frame.getBackground());
         g.fillRect(0, 0, frame.getWidth(), frame.getHeight());
 
