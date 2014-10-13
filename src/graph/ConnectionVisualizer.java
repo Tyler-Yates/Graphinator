@@ -9,7 +9,7 @@ import java.util.Set;
 class ConnectionVisualizer {
 
     private final ConnectionManager manager;
-    private final ConnectionCacher cacher;
+    private final ConnectionCacher cacher = new ConnectionCacher();
 
     /**
      * Constructs a new visualizer that uses the given {@link graph.ConnectionManager} to gather
@@ -17,9 +17,8 @@ class ConnectionVisualizer {
      *
      * @param connectionManager the connection manager for the graph
      */
-    public ConnectionVisualizer(ConnectionManager connectionManager) {
+    ConnectionVisualizer(ConnectionManager connectionManager) {
         manager = connectionManager;
-        cacher = new ConnectionCacher();
     }
 
     /**
@@ -27,9 +26,7 @@ class ConnectionVisualizer {
      *
      * @param g the canvas
      */
-    public void drawConnections(Graphics g) {
-        g.setColor(Color.WHITE);
-
+    void drawConnections(Graphics g) {
         for (Connection connection : cacher.getConnections()) {
             connection.draw(g);
         }
