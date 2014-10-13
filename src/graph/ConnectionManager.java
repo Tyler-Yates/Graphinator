@@ -11,6 +11,7 @@ import java.util.Set;
 class ConnectionManager {
 
     private Map<Vertex, Set<Vertex>> connections = new HashMap<Vertex, Set<Vertex>>();
+    private int numConnections = 0;
 
     /**
      * Returns whether the given vertices are connected in the graph.
@@ -37,8 +38,12 @@ class ConnectionManager {
             neighbors = new HashSet<Vertex>();
             neighbors.add(end);
             connections.put(start, neighbors);
+            numConnections++;
         } else {
-            neighbors.add(end);
+            final boolean successfulAdd = neighbors.add(end);
+            if(successfulAdd) {
+                numConnections++;
+            }
         }
     }
 
@@ -51,7 +56,10 @@ class ConnectionManager {
     public void removeConnection(Vertex start, Vertex end) {
         final Set<Vertex> neighbors = connections.get(start);
         if (neighbors != null) {
-            neighbors.remove(end);
+            final boolean successfulRemove = neighbors.remove(end);
+            if(successfulRemove) {
+                numConnections--;
+            }
         }
     }
 
@@ -62,11 +70,17 @@ class ConnectionManager {
      */
     public void removeVertex(Vertex removed) {
         // Remove all of the connections from the vertex
-        connections.remove(removed);
+        final Set<Vertex> removedConnections = connections.remove(removed);
+        if(removedConnections != null) {
+            numConnections -= removedConnections.size();
+        }
 
         // Remove all connections going to the vertex
         for (Set<Vertex> neighbors : connections.values()) {
-            neighbors.remove(removed);
+            final boolean successfulRemove = neighbors.remove(removed);
+            if(successfulRemove) {
+                numConnections--;
+            }
         }
     }
 
@@ -86,5 +100,14 @@ class ConnectionManager {
         }
 
         return connectionSet;
+    }
+
+    /**
+     * Returns the number of connections for the given graph.
+     *
+     * @return the number of connections
+     */
+    public int numConnections() {
+        return numConnections;
     }
 }
