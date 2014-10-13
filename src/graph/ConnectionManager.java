@@ -18,11 +18,27 @@ class ConnectionManager {
      *
      * @param start the starting vertex
      * @param end the ending vertex
+     *
      * @return whether the two vertices are connected
      */
-    public boolean verticesConnected(Vertex start, Vertex end) {
+    boolean verticesConnected(Vertex start, Vertex end) {
         final Set<Vertex> neighbors = connections.get(start);
         return neighbors != null && neighbors.contains(end);
+    }
+
+    /**
+     * Toggles the connection between the start and the end vertices such that if no connection
+     * exists one will be created and if a connection does exist it will be removed.
+     *
+     * @param start the starting vertex
+     * @param end the ending vertex
+     */
+    void toggleConnection(Vertex start, Vertex end) {
+        if (verticesConnected(start, end)) {
+            removeConnection(start, end);
+        } else {
+            addConnection(start, end);
+        }
     }
 
     /**
@@ -32,7 +48,7 @@ class ConnectionManager {
      * @param start the starting vertex
      * @param end the ending vertex
      */
-    public void addConnection(Vertex start, Vertex end) {
+    void addConnection(Vertex start, Vertex end) {
         Set<Vertex> neighbors = connections.get(start);
         if (neighbors == null) {
             neighbors = new HashSet<Vertex>();
@@ -41,7 +57,7 @@ class ConnectionManager {
             numConnections++;
         } else {
             final boolean successfulAdd = neighbors.add(end);
-            if(successfulAdd) {
+            if (successfulAdd) {
                 numConnections++;
             }
         }
@@ -53,11 +69,11 @@ class ConnectionManager {
      * @param start the starting vertex
      * @param end the ending vertex
      */
-    public void removeConnection(Vertex start, Vertex end) {
+    void removeConnection(Vertex start, Vertex end) {
         final Set<Vertex> neighbors = connections.get(start);
         if (neighbors != null) {
             final boolean successfulRemove = neighbors.remove(end);
-            if(successfulRemove) {
+            if (successfulRemove) {
                 numConnections--;
             }
         }
@@ -68,17 +84,17 @@ class ConnectionManager {
      *
      * @param removed the vertex to remove connections both from and to
      */
-    public void removeVertex(Vertex removed) {
+    void removeVertex(Vertex removed) {
         // Remove all of the connections from the vertex
         final Set<Vertex> removedConnections = connections.remove(removed);
-        if(removedConnections != null) {
+        if (removedConnections != null) {
             numConnections -= removedConnections.size();
         }
 
         // Remove all connections going to the vertex
         for (Set<Vertex> neighbors : connections.values()) {
             final boolean successfulRemove = neighbors.remove(removed);
-            if(successfulRemove) {
+            if (successfulRemove) {
                 numConnections--;
             }
         }
@@ -89,7 +105,7 @@ class ConnectionManager {
      *
      * @return the set of all connections
      */
-    public Set<Connection> getConnections() {
+    Set<Connection> getConnections() {
         final Set<Connection> connectionSet = new HashSet<Connection>();
 
         for (Map.Entry<Vertex, Set<Vertex>> entry : connections.entrySet()) {
@@ -107,7 +123,7 @@ class ConnectionManager {
      *
      * @return the number of connections
      */
-    public int numConnections() {
+    int numConnections() {
         return numConnections;
     }
 }
