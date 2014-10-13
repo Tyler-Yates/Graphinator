@@ -236,4 +236,9 @@ public class Vertex implements Comparable<Vertex>, Serializable {
     public int getDegree() {
         return connections.size();
     }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
 }
