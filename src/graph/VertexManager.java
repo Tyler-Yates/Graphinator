@@ -44,9 +44,22 @@ class VertexManager {
      */
     int createVertex(int x, int y) {
         final int vertexID = nextVertexIDToAssign++;
-        final Vertex newVertex = new Vertex(x, y, vertexID);
-        vertices.put(vertexID, newVertex);
+        createVertex(vertexID, x, y);
         return vertexID;
+    }
+
+    /**
+     * Adds a vertex with the given unique ID to the graph at the given x and y coordinates.
+     *
+     * @param id the unique ID of the vertex
+     * @param x the x coordinate of the vertex
+     * @param y the y coordinate of the vertex
+     */
+    void createVertex(int id, int x, int y) {
+        final Vertex newVertex = new Vertex(id, x, y);
+        //TODO simplify initializing vertices
+        newVertex.initialize();
+        vertices.put(id, newVertex);
     }
 
     /**
