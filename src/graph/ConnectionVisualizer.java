@@ -1,6 +1,7 @@
 package graph;
 
 import java.awt.*;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -36,7 +37,7 @@ class ConnectionVisualizer {
      * Caches connections to save the ConnectionManager from processing connections frequently.
      */
     class ConnectionCacher {
-        private Set<Connection> cachedConnections;
+        private Set<Connection> cachedConnections = new HashSet<>();
 
         /**
          * Returns the connections of the graph. If the connections have been changed the cache will

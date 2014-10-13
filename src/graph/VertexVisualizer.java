@@ -2,6 +2,7 @@ package graph;
 
 import java.awt.*;
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * Handles visualizing vertices of a graph.
@@ -25,7 +26,7 @@ class VertexVisualizer {
      * Caches the vertices of a graph to save the vertex manager from processing vertices.
      */
     class VertexCacher {
-        private Collection<Vertex> cachedVertices;
+        private Collection<Vertex> cachedVertices = new HashSet<>();
 
         /**
          * Returns the vertices of the graph. If the vertices have been changed the cache will be
