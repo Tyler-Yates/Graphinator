@@ -30,11 +30,8 @@ class ConnectionVisualizer {
     public void drawConnections(Graphics g) {
         g.setColor(Color.WHITE);
 
-        final Set<Connection> connections = cacher.getConnections();
-        for (Connection connection : connections) {
-            final Vertex start = connection.getStart();
-            final Vertex end = connection.getEnd();
-            g.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
+        for (Connection connection : cacher.getConnections()) {
+            connection.draw(g);
         }
     }
 
