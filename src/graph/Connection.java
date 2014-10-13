@@ -10,7 +10,6 @@ public class Connection {
 
     private final Vertex start;
     private final Vertex end;
-    private final Line2D line;
 
     private boolean selected;
 
@@ -23,7 +22,6 @@ public class Connection {
     public Connection(Vertex start, Vertex end) {
         this.start = start;
         this.end = end;
-        line = new Line2D.Double(start.getX(), start.getY(), end.getX(), end.getY());
     }
 
     /**
@@ -63,6 +61,7 @@ public class Connection {
      * @return the distance between the point and the line
      */
     public double distance(int x, int y) {
+        final Line2D line = new Line2D.Double(start.getX(), start.getY(), end.getX(), end.getY());
         return line.ptSegDist(x, y);
     }
 
