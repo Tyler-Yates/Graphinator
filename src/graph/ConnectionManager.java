@@ -69,4 +69,22 @@ class ConnectionManager {
             neighbors.remove(removed);
         }
     }
+
+    /**
+     * Returns a set representing all connections in the graph.
+     *
+     * @return the set of all connections
+     */
+    public Set<Connection> getConnections() {
+        final Set<Connection> connectionSet = new HashSet<Connection>();
+
+        for (Map.Entry<Vertex, Set<Vertex>> entry : connections.entrySet()) {
+            for (Vertex end : entry.getValue()) {
+                final Vertex start = entry.getKey();
+                connectionSet.add(new Connection(start, end));
+            }
+        }
+
+        return connectionSet;
+    }
 }
