@@ -45,4 +45,6 @@ public class Connection {
         }
         return false;
     }
+
+    //TODO add methods for distance and drawing
 }
