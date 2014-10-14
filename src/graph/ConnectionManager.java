@@ -10,7 +10,7 @@ import java.util.Set;
  */
 class ConnectionManager {
 
-    private Map<Vertex, Set<Vertex>> connections = new HashMap<Vertex, Set<Vertex>>();
+    private final Map<Vertex, Set<Vertex>> connections = new HashMap<>();
     private int numConnections = 0;
 
     /**
@@ -51,7 +51,7 @@ class ConnectionManager {
     void addConnection(Vertex start, Vertex end) {
         Set<Vertex> neighbors = connections.get(start);
         if (neighbors == null) {
-            neighbors = new HashSet<Vertex>();
+            neighbors = new HashSet<>();
             neighbors.add(end);
             connections.put(start, neighbors);
             numConnections++;
@@ -115,7 +115,7 @@ class ConnectionManager {
      * @return the set of all connections
      */
     Set<Connection> getConnections() {
-        final Set<Connection> connectionSet = new HashSet<Connection>();
+        final Set<Connection> connectionSet = new HashSet<>();
 
         for (Map.Entry<Vertex, Set<Vertex>> entry : connections.entrySet()) {
             for (Vertex end : entry.getValue()) {
