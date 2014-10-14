@@ -80,6 +80,15 @@ class ConnectionManager {
     }
 
     /**
+     * Removes the given connection from the graph if it exists.
+     *
+     * @param connection the connection
+     */
+    void removeConnection(Connection connection) {
+        removeConnection(connection.getStart(), connection.getEnd());
+    }
+
+    /**
      * Removes all connections both to and from the given vertex from the graph.
      *
      * @param removed the vertex to remove connections both from and to
@@ -116,6 +125,17 @@ class ConnectionManager {
         }
 
         return connectionSet;
+    }
+
+    /**
+     * Returns the neighbors of the given vertex.
+     *
+     * @param start the starting vertex
+     *
+     * @return the neighbors
+     */
+    Set<Vertex> getNeighbors(Vertex start) {
+        return connections.get(start);
     }
 
     /**
