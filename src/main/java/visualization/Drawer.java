@@ -329,6 +329,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                             // If the cursor is within the vertex toggle a connection
                             if (v.distance(x, y) < Vertex.getRadius()) {
                                 graph.toggleConnection(selectedVertex, v);
+                                //TODO do not perform this for directed graphs
+                                graph.toggleConnection(v, selectedVertex);
                                 selectedVertex = null;
                                 graph.removeHighlights();
                                 repaint();
