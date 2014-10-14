@@ -10,8 +10,18 @@ import java.util.Set;
  */
 class ConnectionManager {
 
+    private final Graph graph;
     private final Map<Vertex, Set<Vertex>> connections = new HashMap<>();
     private int numConnections = 0;
+
+    /**
+     * Constructs a new connection manager for the given graph.
+     *
+     * @param graph the given graph
+     */
+    ConnectionManager(Graph graph) {
+        this.graph = graph;
+    }
 
     /**
      * Returns whether the given vertices are connected in the graph.
@@ -39,6 +49,8 @@ class ConnectionManager {
         } else {
             addConnection(start, end);
         }
+
+        graph.structurallyChanged();
     }
 
     /**
@@ -61,6 +73,8 @@ class ConnectionManager {
                 numConnections++;
             }
         }
+
+        graph.structurallyChanged();
     }
 
     /**
@@ -77,6 +91,8 @@ class ConnectionManager {
                 numConnections--;
             }
         }
+
+        graph.structurallyChanged();
     }
 
     /**
@@ -86,6 +102,7 @@ class ConnectionManager {
      */
     void removeConnection(Connection connection) {
         removeConnection(connection.getStart(), connection.getEnd());
+        graph.structurallyChanged();
     }
 
     /**
@@ -107,6 +124,8 @@ class ConnectionManager {
                 numConnections--;
             }
         }
+
+        graph.structurallyChanged();
     }
 
     /**
@@ -128,14 +147,19 @@ class ConnectionManager {
     }
 
     /**
-     * Returns the neighbors of the given vertex.
+     * Returns the neighbors of the given vertex. If the vertex has no neighbors an empty set
+     * will be returned.
      *
      * @param start the starting vertex
      *
      * @return the neighbors
      */
     Set<Vertex> getNeighbors(Vertex start) {
-        return connections.get(start);
+        Set<Vertex> neighbors = connections.get(start);
+        if (neighbors == null) {
+            neighbors = new HashSet<>();
+        }
+        return neighbors;
     }
 
     /**

@@ -27,6 +27,7 @@ public class InfoPanel {
         g.drawString("Vertex ID: " + Drawer.infoNode.getID(), x + 2, y + 12);
         g.drawString("Color: " + Drawer.infoNode.getColor(), x + 2, y + 27);
         g.drawString("Degree: " + Drawer.infoNode.getDegree(), x + 2, y + 42);
-        g.drawString("Circuits: " + Drawer.graph.findCircuits(Drawer.infoNode).size(), x + 2, y + 57);
+        g.drawString("Circuits: " + Drawer.graph.getPropertyFinder().findCircuits(Drawer
+                .infoNode).size(), x + 2, y + 57);
     }
 }

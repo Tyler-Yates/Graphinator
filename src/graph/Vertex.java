@@ -4,43 +4,31 @@ import visualization.Drawer;
 
 import java.awt.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.Set;
 
-public class Vertex implements Comparable<Vertex>, Serializable {
+public class Vertex implements Serializable {
     private static final long serialVersionUID = 1122311460388446576L;
     private int color = 0;
     private int drawX, drawY;
-    private int id;
+    private final int id;
     private static final int radius = 20;
-    private static int ID = 0;
-    private static int maxColor = 1;
-    private static ArrayList<Color> colors = null;
-    private HashSet<Edge> connections = new HashSet<Edge>();
-    private ArrayList<Integer> invalidColors = new ArrayList<Integer>();
+
+    private final Graph graph;
 
     private boolean selected = false;
 
-
-    public Vertex(int dx, int dy) {
-        id = ID++;
-        drawX = dx;
-        drawY = dy;
-    }
-
-    public Vertex(int id, int dx, int dy) {
+    Vertex(int id, int dx, int dy, Graph graph) {
         this.id = id;
-        ID = id;
         drawX = dx;
         drawY = dy;
+        this.graph = graph;
     }
 
     public void select() {
         selected = true;
     }
 
-    public void unselect() {
+    public void deselect() {
         selected = false;
     }
 
@@ -65,23 +53,8 @@ public class Vertex implements Comparable<Vertex>, Serializable {
         return getID() == other.getID();
     }
 
-    public void addConnection(Edge connection) {
-        if (connection == null) {
-            return;
-        }
-        connections.add(connection);
-    }
-
-    public void initialize() {
-        if (color != 0) {
-            return;
-        }
-
-        color = 1;
-
-        for (Vertex v : getNeighbors()) {
-            v.chooseColor();
-        }
+    public void addConnection(Vertex end) {
+        graph.getConnectionManager().addConnection(this, end);
     }
 
     public int getColor() {
@@ -89,84 +62,11 @@ public class Vertex implements Comparable<Vertex>, Serializable {
     }
 
     public void setColor(int colorValue) {
-        if (colorValue > maxColor) {
-            maxColor = colorValue;
-        }
         color = colorValue;
     }
 
-    public void chooseColor() {
-        if (color != 0) {
-            return;
-        }
-
-        for (Vertex v : getNeighbors()) {
-            int neighborColor = v.getColor();
-            invalidColors.add(neighborColor);
-        }
-
-        int k = 1;
-        while (color == 0) {
-            if (!invalidColors.contains(k)) {
-                setColor(k);
-            }
-            k++;
-        }
-
-        for (Vertex v : getNeighbors()) {
-            v.chooseColor();
-        }
-    }
-
-    public HashSet<Edge> getConnections() {
-        return connections;
-    }
-
-    public HashSet<Vertex> getNeighbors() {
-        final HashSet<Vertex> vertexes = new HashSet<Vertex>();
-        for (Edge edge : connections) {
-            vertexes.add(edge.getEnd());
-        }
-
-        return vertexes;
-    }
-
-    public static void initColors() {
-        Random generator = new Random();
-        double golden_ratio_conjugate = 0.618033988749895;
-        double HSB;
-        int toRGB;
-        if (colors == null) {
-            colors = new ArrayList<Color>();
-        } else {
-            return;
-        }
-        colors.add(null);
-        colors.add(Color.LIGHT_GRAY);
-        colors.add(Color.red);
-        colors.add(Color.blue);
-        colors.add(Color.GREEN);
-        colors.add(Color.yellow);
-        colors.add(Color.MAGENTA);
-        colors.add(Color.orange);
-
-        for (int i = 0; i < 1000; i++) {
-            HSB = generator.nextDouble();
-            HSB += golden_ratio_conjugate;
-            HSB %= 1;
-            toRGB = Color.HSBtoRGB((float) HSB, (float) 0.99, (float) 0.99);
-            colors.add(new Color(toRGB));
-        }
-    }
-
-    private static Color getColor(int value) {
-        if (colors == null) {
-            initColors();
-        }
-        if (value >= colors.size()) {
-            return null;
-        }
-        return colors.get(value);
+    public Set<Vertex> getNeighbors() {
+        return graph.getConnectionManager().getNeighbors(this);
     }
 
     public int getX() {
@@ -178,7 +78,7 @@ public class Vertex implements Comparable<Vertex>, Serializable {
     }
 
     public void draw(Graphics g, int cX, int cY) {
-        Color c = getColor(color);
+        Color c = graph.getColorManager().getColor(color);
         if (c == null) {
             c = Drawer.frame.getBackground();
         }
@@ -193,52 +93,69 @@ public class Vertex implements Comparable<Vertex>, Serializable {
         g.drawOval(drawX - radius / 2 + cX, drawY - radius / 2 + cY, radius, radius);
     }
 
-    public int numberConnections() {
-        return connections.size();
-    }
-
-    public static int getMaxColor() {
-        return maxColor;
+    /**
+     * Returns the degree of the vertex.
+     *
+     * @return the degree of the vertex
+     */
+    public int getDegree() {
+        return graph.getConnectionManager().getNeighbors(this).size();
     }
 
     public String toString() {
         return "" + getID();
     }
 
-    public void resetColor() {
-        invalidColors.clear();
-        color = 0;
-    }
-
+    /**
+     * Removes the connection between the current vertex and the given vertex if it exists.
+     *
+     * @param other the given vertex
+     */
     public void removeConnection(Vertex other) {
-        final Edge removal = new Edge(this, other);
-        connections.remove(removal);
+        graph.getConnectionManager().removeConnection(this, other);
     }
 
-    public void removeConnection(Edge connection) {
-        connections.remove(connection);
+    /**
+     * Returns whether the current vertex is a neighbor to the given vertex. If this method
+     * returns true there is a connection from the given vertex to the current vertex.
+     *
+     * @param other the other vertex
+     *
+     * @return whether the current vertex is a neighbor to the given vertex
+     */
+    public boolean isNeighborTo(Vertex other) {
+        return graph.getConnectionManager().verticesConnected(other, this);
     }
 
-    public boolean isNeighbor(Vertex other) {
-        final Edge check = new Edge(this, other);
-        return connections.contains(check);
-    }
-
-    @Override
-    public int compareTo(Vertex o) {
-        return o.getID() - ID;
-    }
-
-    public static void resetMaxColor() {
-        maxColor = 1;
-    }
-
-    public int getDegree() {
-        return connections.size();
+    /**
+     * Returns whether the given vertex is a neighbor to the current vertex. If this method
+     * returns true there is a connection from the current vertex to the other vertex.
+     *
+     * @param other the other vertex
+     *
+     * @return whether the other vertex is a neighbor to the current vertex
+     */
+    public boolean connectsTo(Vertex other) {
+        return graph.getConnectionManager().verticesConnected(this, other);
     }
 
     @Override
     public int hashCode() {
         return id;
+    }
+
+    /**
+     * Returns the distance between the current vertex and the point represented by the given x
+     * and y coordinates.
+     *
+     * @param x the x coordinate of the point
+     * @param y the y coordinate of the point
+     *
+     * @return the distance between this vertex and the given point
+     */
+    public double distance(int x, int y) {
+        final Point vertex = new Point(drawX, drawY);
+        final Point mouse = new Point(x, y);
+        return vertex.distance(mouse);
     }
 }

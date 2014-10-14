@@ -16,9 +16,9 @@ class VertexVisualizer {
         this.vertexManager = vertexManager;
     }
 
-    void drawVertices(Graphics g) {
-        for(Vertex vertex : vertexCacher.getVertices()) {
-            vertex.draw(g);
+    void drawVertices(Graphics g, int canvasX, int canvasY) {
+        for (Vertex vertex : vertexCacher.getVertices()) {
+            vertex.draw(g, canvasX, canvasY);
         }
     }
 

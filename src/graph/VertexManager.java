@@ -9,18 +9,18 @@ import java.util.Map;
  */
 class VertexManager {
 
-    private final ConnectionManager connectionManager;
+    private final Graph graph;
 
     private final Map<Integer, Vertex> vertices = new HashMap<>();
     private int nextVertexIDToAssign = 0;
 
     /**
-     * Constructs a new vertex manager with the given connection manager.
+     * Constructs a new vertex manager for the given graph.
      *
-     * @param connectionManager the connection manager
+     * @param graph the given graph
      */
-    VertexManager(ConnectionManager connectionManager) {
-        this.connectionManager = connectionManager;
+    VertexManager(Graph graph) {
+        this.graph = graph;
     }
 
     /**
@@ -45,6 +45,7 @@ class VertexManager {
     int createVertex(int x, int y) {
         final int vertexID = nextVertexIDToAssign++;
         createVertex(vertexID, x, y);
+        graph.structurallyChanged();
         return vertexID;
     }
 
@@ -56,9 +57,8 @@ class VertexManager {
      * @param y the y coordinate of the vertex
      */
     void createVertex(int id, int x, int y) {
-        final Vertex newVertex = new Vertex(id, x, y);
-        //TODO simplify initializing vertices
-        newVertex.initialize();
+        final Vertex newVertex = new Vertex(id, x, y, graph);
+        graph.structurallyChanged();
         vertices.put(id, newVertex);
     }
 
@@ -76,6 +76,7 @@ class VertexManager {
         if (vertexToRemove != null) {
             removeVertex(vertexToRemove);
         }
+        graph.structurallyChanged();
         return vertexToRemove;
     }
 
@@ -86,8 +87,9 @@ class VertexManager {
      * @param vertexToRemove the vertex to remove
      */
     void removeVertex(Vertex vertexToRemove) {
-        connectionManager.removeVertex(vertexToRemove);
+        graph.getConnectionManager().removeVertex(vertexToRemove);
         vertices.remove(vertexToRemove.getID());
+        graph.structurallyChanged();
     }
 
     /**

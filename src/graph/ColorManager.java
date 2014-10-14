@@ -16,7 +16,7 @@ import java.util.Set;
  * Manages the vertex colorings. Colors are assigned a unique ID that starts at zero.
  */
 class ColorManager {
-    private final VertexManager vertexManager;
+    private final Graph graph;
 
     private final Random generator = new Random();
     private static final double GOLDEN_RATIO_CONJUGATE = 0.618033988749895;
@@ -25,12 +25,12 @@ class ColorManager {
     private int maximumColor = -1;
 
     /**
-     * Constructs a new color manager with default colors.
+     * Constructs a new color manager for the given graph.
      *
-     * @param vertexManager the vertex manager
+     * @param graph the given graph
      */
-    ColorManager(VertexManager vertexManager) {
-        this.vertexManager = vertexManager;
+    ColorManager(Graph graph) {
+        this.graph = graph;
         colors.add(Color.LIGHT_GRAY);
         colors.add(Color.RED);
         colors.add(Color.BLUE);
@@ -79,14 +79,14 @@ class ColorManager {
     void assignColors() {
         // Reset the maximum color as we are reassigning all colors
         maximumColor = -1;
-        final Iterator<Vertex> vertexIterator = vertexManager.getVertices().iterator();
+        final Iterator<Vertex> vertexIterator = graph.getVertexManager().getVertices().iterator();
         final Set<Vertex> verticesWithColorAssigned = new HashSet<>();
 
         // Start the color assignment from a random vertex in the graph
         processFromVertex(vertexIterator.next(), verticesWithColorAssigned);
 
         // If there are still vertices we have not assigned colors to then the graph is unconnected
-        while (verticesWithColorAssigned.size() < vertexManager.numberOfVertices()) {
+        while (verticesWithColorAssigned.size() < graph.getVertexManager().numberOfVertices()) {
             final Vertex vertex = vertexIterator.next();
             if (!verticesWithColorAssigned.contains(vertex)) {
                 processFromVertex(vertex, verticesWithColorAssigned);
@@ -106,7 +106,7 @@ class ColorManager {
 
             // Assign the first valid color to current
             final int assignedColor = pickFirstValidColor(forbiddenColors.get(current));
-            if(assignedColor > maximumColor) {
+            if (assignedColor > maximumColor) {
                 maximumColor = assignedColor;
             }
             current.setColor(assignedColor);

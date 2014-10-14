@@ -27,9 +27,9 @@ class ConnectionVisualizer {
      *
      * @param g the canvas
      */
-    void drawConnections(Graphics g) {
+    void drawConnections(Graphics g, int canvasX, int canvasY) {
         for (Connection connection : cacher.getConnections()) {
-            connection.draw(g);
+            connection.draw(g, canvasX, canvasY);
         }
     }
 

@@ -1,24 +1,36 @@
 package graph;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 
 public class PropertyFinder {
 
+    private final Graph graph;
+
     static boolean tempCycle = false;
 
-    public static int maxDegree(Graph g) {
-        ArrayList<Vertex> vertices;
+    /**
+     * Constructs a property finder for the given graph.
+     *
+     * @param graph the given graph
+     */
+    public PropertyFinder(Graph graph) {
+        this.graph = graph;
+    }
+
+    public int maxDegree(Graph g) {
+        Collection<Vertex> vertices;
         int max, numEdges, numVertices;
 
         vertices = g.getVertices();
-        numVertices = g.vertexCount();
+        numVertices = g.numberOfVertices();
         max = 0;
 
-        for (int i = 0; i < numVertices; i++) {
-            numEdges = vertices.get(i).numberConnections();
+        for (Vertex vertex : vertices) {
+            numEdges = vertex.getDegree();
             if (numEdges > max) {
                 max = numEdges;
             }
@@ -27,24 +39,23 @@ public class PropertyFinder {
         return max;
     }
 
-    public static boolean isBipartite() {
-        return Vertex.getMaxColor() <= 2;
+    public boolean isBipartite() {
+        return graph.getColorManager().numberOfColors() <= 2;
     }
 
-    public static boolean isConnected(Graph g) {
-        if (g.vertexCount() == 0) {
+    public boolean isConnected(Graph g) {
+        if (g.numberOfVertices() == 0) {
             return true;
         }
 
-        final Set<Vertex> visited = new HashSet<Vertex>();
-        Vertex v;
-        v = g.getVertex(0);
+        final Set<Vertex> visited = new HashSet<>();
+        Vertex v = g.getVertex(0);
         connectedH(visited, v);
 
-        return visited.size() == g.vertexCount();
+        return visited.size() == g.numberOfVertices();
     }
 
-    public static void connectedH(Set<Vertex> visited, Vertex v) {
+    public void connectedH(Set<Vertex> visited, Vertex v) {
         if (visited.contains(v)) {
             return;
         }
@@ -57,9 +68,9 @@ public class PropertyFinder {
     }
 
 
-    public static boolean isTree(Graph g) {
+    public boolean isTree(Graph g) {
         tempCycle = false;
-        if (g.connectionCount() / 2 != g.vertexCount() - 1) {
+        if (g.numberOfConnections() / 2 != g.numberOfVertices() - 1) {
             return false;
         }
         for (Vertex v : g.getVertices()) {
@@ -72,8 +83,7 @@ public class PropertyFinder {
         return true;
     }
 
-    private static void cycleExists(Vertex original, Vertex parent, Vertex v,
-            ArrayList<Vertex> visited) {
+    private void cycleExists(Vertex original, Vertex parent, Vertex v, ArrayList<Vertex> visited) {
         if (tempCycle) {
             return;
         }
@@ -92,6 +102,45 @@ public class PropertyFinder {
                 if (!temp.equals(parent)) {
                     cycleExists(original, v, temp, visited);
                 }
+            }
+        }
+    }
+
+    public ArrayList<Circuit> findCircuits(Vertex v) {
+        if (v == null) {
+            return null;
+        }
+        ArrayList<Circuit> circuits = new ArrayList<Circuit>();
+
+
+        for (Vertex temp : v.getNeighbors()) {
+            ArrayList<Connection> connections = new ArrayList<>();
+            connections.add(new Connection(v, temp));
+            Circuit c = new Circuit();
+            c.addVertex(v);
+            findCircuitsHelper(temp, v, c, connections, circuits);
+        }
+        return circuits;
+    }
+
+    private void findCircuitsHelper(Vertex current, Vertex original, Circuit currentPath,
+            ArrayList<Connection> connections, ArrayList<Circuit> ans) {
+        //System.out.println(current+" "+connections);
+        currentPath.addVertex(current);
+        outer:
+        for (Vertex v : current.getNeighbors()) {
+            Connection newConnect = new Connection(current, v);
+            for (Connection e : connections) {
+                if (e.equals(newConnect)) {
+                    continue outer;
+                }
+            }
+            if (v.equals(original)) {
+                ans.add(currentPath.clone());
+            } else {
+                connections.add(newConnect);
+                currentPath.addVertex(v);
+                findCircuitsHelper(v, original, currentPath, connections, ans);
             }
         }
     }

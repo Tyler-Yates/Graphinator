@@ -83,14 +83,17 @@ public class Connection {
      * Draws the connection to the given canvas.
      *
      * @param g the canvas
+     * @param canvasX the x coordinate of the canvas
+     * @param canvasY the y coordinate of the canvas
      */
-    public void draw(Graphics g) {
+    public void draw(Graphics g, int canvasX, int canvasY) {
         if (selected) {
             g.setColor(Color.RED);
         } else {
             g.setColor(Color.WHITE);
         }
 
-        g.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
+        g.drawLine(start.getX() + canvasX, start.getY() + canvasY, end.getX() + canvasX,
+                end.getY() + canvasY);
     }
 }

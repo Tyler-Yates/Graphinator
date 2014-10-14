@@ -1,102 +1,256 @@
 package graph;
 
-import java.util.ArrayList;
+import java.awt.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-
+/**
+ * Represents a graph including all the connections and vertices of the graph.
+ */
 public class Graph {
-    protected ArrayList<Vertex> vertices = new ArrayList<Vertex>();
+    private final ConnectionManager connectionManager = new ConnectionManager(this);
+    private final ConnectionVisualizer connectionVisualizer = new ConnectionVisualizer
+            (connectionManager);
+    private final VertexManager vertexManager = new VertexManager(this);
+    private final VertexVisualizer vertexVisualizer = new VertexVisualizer(vertexManager);
+    private final ColorManager colorManager = new ColorManager(this);
+    private final PropertyFinder propertyFinder = new PropertyFinder(this);
 
-    public Graph(ArrayList<Vertex> readObject) {
-        vertices = readObject;
+    private boolean structureChanged = false;
+
+    private static final double REMOVAL_DISTANCE = 5.0;
+
+    ConnectionManager getConnectionManager() {
+        return connectionManager;
     }
 
-    public Graph() {
-
+    VertexManager getVertexManager() {
+        return vertexManager;
     }
 
-    public Graph(Vertex... vertexs) {
-        vertices = new ArrayList<Vertex>();
-        for (int i = 0; i < vertexs.length; i++) {
-            vertices.add(vertexs[i]);
+    ColorManager getColorManager() {
+        return colorManager;
+    }
+
+    public PropertyFinder getPropertyFinder() {
+        return propertyFinder;
+    }
+
+    /**
+     * Returns the vertices of the current graph.
+     *
+     * @return the vertices
+     */
+    public Collection<Vertex> getVertices() {
+        return vertexManager.getVertices();
+    }
+
+    /**
+     * Returns the vertex with the given ID or {@code null} if a vertex with the given ID is not
+     * present in the graph.
+     *
+     * @param ID the unique ID of the vertex
+     *
+     * @return the vertex
+     */
+    public Vertex getVertex(int ID) {
+        return vertexManager.getVertex(ID);
+    }
+
+    /**
+     * Adds a vertex to the graph at the given x and y coordinates.
+     *
+     * @param x the x coordinate of the vertex
+     * @param y the y coordinate of the vertex
+     *
+     * @return the unique ID assigned to the vertex
+     */
+    public int createVertex(int x, int y) {
+        return vertexManager.createVertex(x, y);
+    }
+
+    /**
+     * Adds a vertex with the given unique ID to the graph at the given x and y coordinates.
+     *
+     * @param id the unique ID of the vertex
+     * @param x the x coordinate of the vertex
+     * @param y the y coordinate of the vertex
+     */
+    public void createVertex(int id, int x, int y) {
+        vertexManager.createVertex(id, x, y);
+    }
+
+    /**
+     * Removes the given vertex from the graph. This also removes all edges
+     * associated with that vertex in the graph.
+     *
+     * @param vertexToRemove the vertex to remove
+     */
+    public void removeVertex(Vertex vertexToRemove) {
+        vertexManager.removeVertex(vertexToRemove);
+    }
+
+    /**
+     * Toggles the connection between the start and the end vertices such that if no connection
+     * exists one will be created and if a connection does exist it will be removed.
+     *
+     * @param start the starting vertex
+     * @param end the ending vertex
+     */
+    public void toggleConnection(Vertex start, Vertex end) {
+        connectionManager.toggleConnection(start, end);
+    }
+
+    /**
+     * Adds the given connection to the graph. The connection is unidirectional such that {@code
+     * start} may go to {@code end} but {@code end} may not go to {@code start}.
+     *
+     * @param start the starting vertex
+     * @param end the ending vertex
+     */
+    public void addConnection(Vertex start, Vertex end) {
+        connectionManager.addConnection(start, end);
+    }
+
+    /**
+     * Removes the given connection from the graph if it exists.
+     *
+     * @param connection the connection
+     */
+    public void removeConnection(Connection connection) {
+        connectionManager.removeConnection(connection);
+    }
+
+    /**
+     * Returns the total number of connections in the graph.
+     *
+     * @return the number of connections
+     */
+    public int numberOfConnections() {
+        return connectionManager.numConnections();
+    }
+
+    /**
+     * Returns the total number of vertices in the graph.
+     *
+     * @return the number of vertices
+     */
+    public int numberOfVertices() {
+        return vertexManager.numberOfVertices();
+    }
+
+    /**
+     * Returns the number of colors present in the graph. Graphs with no vertices are defined to
+     * have zero colors.
+     *
+     * @return the number of colors
+     */
+    public int numberOfColors() {
+        return colorManager.numberOfColors();
+    }
+
+    /**
+     * Called by the manager classes to notify the graph that it has been modified structurally.
+     */
+    void structurallyChanged() {
+        structureChanged = true;
+    }
+
+    /**
+     * Checks whether the graph has been modified structurally and if so takes appropriate
+     * actions to ensure that the graph properties are maintained.
+     */
+    private void checkForStructuralChanges() {
+        // If the graph has been modified we need to update properties
+        if (structureChanged) {
+            // We need to reassign colors because the modified structure of the graph may cause a
+            // new coloring
+            colorManager.assignColors();
+        }
+
+        structureChanged = false;
+    }
+
+    /**
+     * Draws the current graph to the given canvas.
+     *
+     * @param g the canvas
+     * @param canvasX the x position of the canvas
+     * @param canvasY the y position of the canvas
+     */
+    public void drawGraph(Graphics g, int canvasX, int canvasY) {
+        checkForStructuralChanges();
+
+        connectionVisualizer.drawConnections(g, canvasX, canvasY);
+        vertexVisualizer.drawVertices(g, canvasX, canvasY);
+    }
+
+    /**
+     * Removes the highlight for all vertices and connections in the graph.
+     */
+    public void removeHighlights() {
+        // Remove highlight from all of the vertices that are in range
+        for (Vertex vertex : vertexManager.getVertices()) {
+            vertex.deselect();
+        }
+
+        // Remove highlight from all of the connections that are in range
+        for (Connection connection : connectionManager.getConnections()) {
+            connection.deselect();
         }
     }
 
-    public ArrayList<Vertex> getVertices() {
-        return vertices;
-    }
-
-    public Vertex getVertex(int index) {
-        if (index >= 0 && index < vertices.size()) {
-            return vertices.get(index);
-        }
-        return null;
-    }
-
-    public Vertex getVertexByID(int id) {
-        for (Vertex vertex : vertices) {
-            if (vertex.getID() == id) {
-                return vertex;
-            }
-        }
-        return null;
-    }
-
-    public boolean addVertex(Vertex a) {
-        vertices.add(a);
-        return true;
-    }
-
-    public void removeVertex(Vertex b) {
-        vertices.remove(b);
-    }
-
-    public int connectionCount() {
-        int sum = 0;
-        for (Vertex v : vertices) {
-            sum += v.numberConnections();
-        }
-        return sum;
-    }
-
-    public int vertexCount() {
-        return vertices.size();
-    }
-
-    public ArrayList<Circuit> findCircuits(Vertex v) {
-        if (v == null) {
-            return null;
-        }
-        ArrayList<Circuit> circuits = new ArrayList<Circuit>();
-
-
-        for (Vertex temp : v.getNeighbors()) {
-            ArrayList<Edge> connections = new ArrayList<Edge>();
-            connections.add(new Edge(v, temp));
-            Circuit c = new Circuit();
-            c.addVertex(v);
-            findCircuitsHelper(temp, v, c, connections, circuits);
-        }
-        return circuits;
-    }
-
-    private void findCircuitsHelper(Vertex current, Vertex original, Circuit currentPath,
-            ArrayList<Edge> connections, ArrayList<Circuit> ans) {
-        //System.out.println(current+" "+connections);
-        currentPath.addVertex(current);
-        outer:
-        for (Vertex v : current.getNeighbors()) {
-            Edge newConnect = new Edge(current, v);
-            for (Edge e : connections) {
-                if (e.equals(newConnect)) {
-                    continue outer;
-                }
-            }
-            if (v.equals(original)) {
-                ans.add(currentPath.clone());
+    /**
+     * Marks all vertices and connections that are within range to be removed using the given x
+     * and y coordinates of the mouse.
+     *
+     * @param mouseX the x coordinate of the mouse
+     * @param mouseY the y coordinate of the mouse
+     */
+    public void highlightRemovals(int mouseX, int mouseY) {
+        // Highlight all of the vertices that are in range
+        for (Vertex vertex : vertexManager.getVertices()) {
+            if (vertex.distance(mouseX, mouseY) < REMOVAL_DISTANCE) {
+                vertex.select();
             } else {
-                connections.add(newConnect);
-                currentPath.addVertex(v);
-                findCircuitsHelper(v, original, currentPath, connections, ans);
+                vertex.deselect();
+            }
+        }
+
+        //Highlight all of the connections that are in range
+        for (Connection connection : connectionManager.getConnections()) {
+            if (connection.distance(mouseX, mouseY) < REMOVAL_DISTANCE) {
+                connection.select();
+            } else {
+                connection.deselect();
+            }
+        }
+    }
+
+    /**
+     * Removes all vertices and connections that are within range to be removed using the given x
+     * and y coordinates of the mouse.
+     *
+     * @param mouseX the x coordinate of the mouse
+     * @param mouseY the y coordinate of the mouse
+     */
+    public void remove(int mouseX, int mouseY) {
+        // Highlight all of the vertices that are in range
+        final Set<Vertex> verticesToRemove = new HashSet<>();
+        for (Vertex vertex : vertexManager.getVertices()) {
+            if (vertex.distance(mouseX, mouseY) < REMOVAL_DISTANCE) {
+                verticesToRemove.add(vertex);
+            }
+        }
+        for (Vertex vertex : verticesToRemove) {
+            removeVertex(vertex);
+        }
+
+        //Highlight all of the connections that are in range
+        for (Connection connection : connectionManager.getConnections()) {
+            if (connection.distance(mouseX, mouseY) < REMOVAL_DISTANCE) {
+                removeConnection(connection);
             }
         }
     }

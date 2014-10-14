@@ -18,11 +18,11 @@ public abstract class Button {
     /**
      * Constructs a new button at the given location with the given size.
      *
-     * @param x      the x position of the button
-     * @param y      the y position of the button
-     * @param width  the width of the button in pixels
+     * @param x the x position of the button
+     * @param y the y position of the button
+     * @param width the width of the button in pixels
      * @param height the height of the button in pixels
-     * @param text   the text of the button
+     * @param text the text of the button
      */
     public Button(int x, int y, int width, int height, String text) {
         this.x = x;
@@ -95,6 +95,7 @@ public abstract class Button {
      *
      * @param cx the x position of the coordinate
      * @param cy the y position of the coordinate
+     *
      * @return whether the coordinate is within the button
      */
     public boolean contains(int cx, int cy) {
@@ -109,12 +110,12 @@ public abstract class Button {
     /**
      * Draws a given string centered x-wise at the given y value using the specified width.
      *
-     * @param g     the graphics object
-     * @param s     the string to draw
-     * @param x     the left-most x position of the box to draw the text in
+     * @param g the graphics object
+     * @param s the string to draw
+     * @param x the left-most x position of the box to draw the text in
      * @param width the width of the text box
-     * @param y     the y position of the text box
-     * @param c     the color to draw the text in
+     * @param y the y position of the text box
+     * @param c the color to draw the text in
      */
     private static void drawStringCentered(Graphics g, String s, int x, int width, int y, Color c) {
         g.setColor(c);
