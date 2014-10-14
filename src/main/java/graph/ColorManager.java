@@ -1,5 +1,8 @@
 package graph;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,13 +19,16 @@ import java.util.Set;
  * Manages the vertex colorings. Colors are assigned a unique ID that starts at zero.
  */
 class ColorManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ColorManager.class);
+
     private final Graph graph;
 
     private final Random generator = new Random();
-    private static final double GOLDEN_RATIO_CONJUGATE = 0.618033988749895;
     private final List<Color> colors = new ArrayList<>();
 
     private int maximumColor = -1;
+
+    private static final double GOLDEN_RATIO_CONJUGATE = 0.618033988749895;
 
     /**
      * Constructs a new color manager for the given graph.
@@ -77,6 +83,8 @@ class ColorManager {
      * Assigns colors to all of the vertices in the graph.
      */
     void assignColors() {
+        LOGGER.debug("assigning colors-------------------------");
+
         // Reset the maximum color as we are reassigning all colors
         maximumColor = -1;
         final Iterator<Vertex> vertexIterator = graph.getVertexManager().getVertices().iterator();
@@ -103,6 +111,7 @@ class ColorManager {
 
         while (!next.isEmpty()) {
             final Vertex current = next.poll();
+            LOGGER.debug("current vertex: " + current);
 
             // Assign the first valid color to current
             final int assignedColor = pickFirstValidColor(forbiddenColors.get(current));
@@ -110,13 +119,16 @@ class ColorManager {
                 maximumColor = assignedColor;
             }
             current.setColor(assignedColor);
+            LOGGER.debug("assigned color: " + assignedColor);
 
             verticesWithColorAssigned.add(current);
 
             final Set<Vertex> neighbors = current.getNeighbors();
+            LOGGER.debug("checking neighbors: " + neighbors);
             for (Vertex neighbor : neighbors) {
                 // Look only at vertices that have not yet been assigned a color
                 if (!verticesWithColorAssigned.contains(neighbor)) {
+                    LOGGER.debug("checking unassigned neighbor: " + neighbor);
                     final Set<Integer> forbidden = forbiddenColors.get(neighbor);
                     if (forbidden == null) {
                         final Set<Integer> newForbidden = new HashSet<>();
@@ -125,8 +137,11 @@ class ColorManager {
                     } else {
                         forbidden.add(assignedColor);
                     }
+                    LOGGER.debug("neighbor's forbidden colors: " + forbiddenColors.get(neighbor));
 
                     next.add(neighbor);
+                } else {
+                    LOGGER.debug("skipping assigned neighbor: " + neighbor);
                 }
             }
         }
