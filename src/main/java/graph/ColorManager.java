@@ -88,6 +88,10 @@ class ColorManager {
      * Assigns colors to all of the vertices in the graph.
      */
     void assignColors() {
+        if(graph.getVertexManager().numberOfVertices() == 0) {
+            return;
+        }
+
         LOGGER.debug("assigning colors-------------------------");
 
         // Reset the maximum color as we are reassigning all colors
