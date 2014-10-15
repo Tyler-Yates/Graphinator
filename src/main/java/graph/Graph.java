@@ -213,6 +213,14 @@ public class Graph {
         for (Vertex vertex : vertexManager.getVertices()) {
             if (vertex.pointInVertex(mouseX, mouseY)) {
                 vertex.select();
+                // Highlight all of the connections originating from the vertex because they will
+                // be removed as well
+                for (Connection connection : connectionManager.getNeighborConnections(vertex)) {
+                    connection.select();
+                }
+                // If the user removes a vertex we will remove all edges as well so don't worry
+                // about checking them
+                return;
             } else {
                 vertex.deselect();
             }

@@ -131,6 +131,25 @@ class ConnectionManager {
     }
 
     /**
+     * Returns the connections of the given vertex. If the vertex has no neighbors an empty set
+     * will be returned.
+     *
+     * @param start the starting vertex
+     *
+     * @return the connections of the vertex
+     */
+    Set<Connection> getNeighborConnections(Vertex start) {
+        final Set<Connection> neighborConnections = new HashSet<>();
+        for (Connection connection : connections) {
+            if (connection.getStart().equals(start)) {
+                neighborConnections.add(connection);
+            }
+        }
+
+        return neighborConnections;
+    }
+
+    /**
      * Returns the number of connections for the given graph.
      *
      * @return the number of connections
