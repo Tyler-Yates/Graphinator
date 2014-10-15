@@ -1,8 +1,6 @@
 package graph;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -11,8 +9,7 @@ import java.util.Set;
 class ConnectionManager {
 
     private final Graph graph;
-    private final Map<Vertex, Set<Vertex>> connections = new HashMap<>();
-    private int numConnections = 0;
+    private final Set<Connection> connections = new HashSet<>();
 
     /**
      * Constructs a new connection manager for the given graph.
@@ -32,8 +29,7 @@ class ConnectionManager {
      * @return whether the two vertices are connected
      */
     boolean verticesConnected(Vertex start, Vertex end) {
-        final Set<Vertex> neighbors = connections.get(start);
-        return neighbors != null && neighbors.contains(end);
+        return connections.contains(new Connection(start, end));
     }
 
     /**
@@ -61,18 +57,7 @@ class ConnectionManager {
      * @param end the ending vertex
      */
     void addConnection(Vertex start, Vertex end) {
-        Set<Vertex> neighbors = connections.get(start);
-        if (neighbors == null) {
-            neighbors = new HashSet<>();
-            neighbors.add(end);
-            connections.put(start, neighbors);
-            numConnections++;
-        } else {
-            final boolean successfulAdd = neighbors.add(end);
-            if (successfulAdd) {
-                numConnections++;
-            }
-        }
+        connections.add(new Connection(start, end));
 
         graph.structurallyChanged();
     }
@@ -84,15 +69,7 @@ class ConnectionManager {
      * @param end the ending vertex
      */
     void removeConnection(Vertex start, Vertex end) {
-        final Set<Vertex> neighbors = connections.get(start);
-        if (neighbors != null) {
-            final boolean successfulRemove = neighbors.remove(end);
-            if (successfulRemove) {
-                numConnections--;
-            }
-        }
-
-        graph.structurallyChanged();
+        removeConnection(new Connection(start, end));
     }
 
     /**
@@ -101,7 +78,7 @@ class ConnectionManager {
      * @param connection the connection
      */
     void removeConnection(Connection connection) {
-        removeConnection(connection.getStart(), connection.getEnd());
+        connections.remove(connection);
         graph.structurallyChanged();
     }
 
@@ -111,18 +88,15 @@ class ConnectionManager {
      * @param removed the vertex to remove connections both from and to
      */
     void removeVertex(Vertex removed) {
-        // Remove all of the connections from the vertex
-        final Set<Vertex> removedConnections = connections.remove(removed);
-        if (removedConnections != null) {
-            numConnections -= removedConnections.size();
-        }
-
-        // Remove all connections going to the vertex
-        for (Set<Vertex> neighbors : connections.values()) {
-            final boolean successfulRemove = neighbors.remove(removed);
-            if (successfulRemove) {
-                numConnections--;
+        // Enumerate the connections to remove to prevent concurrent modification
+        final Set<Connection> connectionsToRemove = new HashSet<>();
+        for (Connection connection : connections) {
+            if (connection.getStart().equals(removed) || connection.getEnd().equals(removed)) {
+                connectionsToRemove.add(connection);
             }
+        }
+        for (Connection connection : connectionsToRemove) {
+            connections.remove(connection);
         }
 
         graph.structurallyChanged();
@@ -134,16 +108,7 @@ class ConnectionManager {
      * @return the set of all connections
      */
     Set<Connection> getConnections() {
-        final Set<Connection> connectionSet = new HashSet<>();
-
-        for (Map.Entry<Vertex, Set<Vertex>> entry : connections.entrySet()) {
-            for (Vertex end : entry.getValue()) {
-                final Vertex start = entry.getKey();
-                connectionSet.add(new Connection(start, end));
-            }
-        }
-
-        return connectionSet;
+        return connections;
     }
 
     /**
@@ -155,10 +120,13 @@ class ConnectionManager {
      * @return the neighbors
      */
     Set<Vertex> getNeighbors(Vertex start) {
-        Set<Vertex> neighbors = connections.get(start);
-        if (neighbors == null) {
-            neighbors = new HashSet<>();
+        final Set<Vertex> neighbors = new HashSet<>();
+        for (Connection connection : connections) {
+            if (connection.getStart().equals(start)) {
+                neighbors.add(connection.getEnd());
+            }
         }
+
         return neighbors;
     }
 
@@ -168,6 +136,6 @@ class ConnectionManager {
      * @return the number of connections
      */
     int numConnections() {
-        return numConnections;
+        return connections.size();
     }
 }
