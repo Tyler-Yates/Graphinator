@@ -11,7 +11,8 @@ public class Vertex implements Serializable {
     private int color = 0;
     private int drawX, drawY;
     private final int id;
-    private static final int radius = 20;
+    private static final int radius = 10;
+    private static final int diameter = radius * 2;
 
     private final Graph graph;
 
@@ -83,14 +84,14 @@ public class Vertex implements Serializable {
             c = Drawer.frame.getBackground();
         }
         g.setColor(c);
-        g.fillOval(drawX - radius / 2 + cX, drawY - radius / 2 + cY, radius, radius);
+        g.fillOval(drawX - radius + cX, drawY - radius + cY, diameter, diameter);
 
         if (selected) {
             g.setColor(Color.red);
         } else {
             g.setColor(Color.white);
         }
-        g.drawOval(drawX - radius / 2 + cX, drawY - radius / 2 + cY, radius, radius);
+        g.drawOval(drawX - radius + cX, drawY - radius + cY, diameter, diameter);
     }
 
     /**
