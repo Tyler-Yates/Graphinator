@@ -256,10 +256,14 @@ public class Graph {
         }
 
         //Highlight all of the connections that are in range
+        final Set<Connection> connectionsToRemove = new HashSet<>();
         for (Connection connection : connectionManager.getConnections()) {
             if (connection.distance(mouseX, mouseY) < REMOVAL_DISTANCE) {
-                removeConnection(connection);
+                connectionsToRemove.add(connection);
             }
+        }
+        for (Connection connection : connectionsToRemove) {
+            removeConnection(connection);
         }
     }
 }
