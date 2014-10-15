@@ -96,4 +96,8 @@ public class Connection {
         g.drawLine(start.getX() + canvasX, start.getY() + canvasY, end.getX() + canvasX,
                 end.getY() + canvasY);
     }
+
+    public boolean isSelected() {
+        return selected;
+    }
 }
