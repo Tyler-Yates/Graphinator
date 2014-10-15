@@ -46,10 +46,6 @@ public class Vertex implements Serializable {
         return id;
     }
 
-    public static int getRadius() {
-        return radius;
-    }
-
     public boolean equals(Vertex other) {
         return getID() == other.getID();
     }
@@ -154,9 +150,22 @@ public class Vertex implements Serializable {
      *
      * @return the distance between this vertex and the given point
      */
-    public double distance(int x, int y) {
+    private double distance(int x, int y) {
         final Point vertex = new Point(drawX, drawY);
         final Point mouse = new Point(x, y);
         return vertex.distance(mouse);
+    }
+
+    /**
+     * Returns whether the point represented by the given coordinates lies withing the current
+     * vertex.
+     *
+     * @param x the x coordinate of the point
+     * @param y the y coordinate of the point
+     *
+     * @return whether the point is within the vertex
+     */
+    public boolean pointInVertex(int x, int y) {
+        return distance(x, y) < radius;
     }
 }

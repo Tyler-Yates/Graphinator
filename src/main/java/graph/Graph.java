@@ -211,7 +211,7 @@ public class Graph {
     public void highlightRemovals(int mouseX, int mouseY) {
         // Highlight all of the vertices that are in range
         for (Vertex vertex : vertexManager.getVertices()) {
-            if (vertex.distance(mouseX, mouseY) < REMOVAL_DISTANCE) {
+            if (vertex.pointInVertex(mouseX, mouseY)) {
                 vertex.select();
             } else {
                 vertex.deselect();
@@ -239,7 +239,7 @@ public class Graph {
         // Highlight all of the vertices that are in range
         final Set<Vertex> verticesToRemove = new HashSet<>();
         for (Vertex vertex : vertexManager.getVertices()) {
-            if (vertex.distance(mouseX, mouseY) < REMOVAL_DISTANCE) {
+            if (vertex.pointInVertex(mouseX, mouseY)) {
                 verticesToRemove.add(vertex);
             }
         }
