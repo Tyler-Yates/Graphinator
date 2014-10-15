@@ -5,6 +5,8 @@ package util;
  */
 public class MalformedGraphException extends Exception {
 
+    private static final long serialVersionUID = 543155159926511493L;
+
     /**
      * Constructs a new exception with the given error message.
      *
