@@ -107,7 +107,6 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
         g.setColor(Color.white);
 
-
         if (mode == MouseMode.CONNECTION && selectedVertex != null) {
             g.drawLine(selectedVertex.getX() + canvasX, selectedVertex.getY() + canvasY, mouseX,
                     mouseY);
