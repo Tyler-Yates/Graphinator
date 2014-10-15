@@ -30,8 +30,8 @@ public class FileOperations {
                 final File theFileToSave = fileChooser.getSelectedFile();
                 theFileToSave.createNewFile();
 
-                final PrintWriter printWriter = new PrintWriter(new BufferedOutputStream(new
-                        FileOutputStream(theFileToSave)));
+                final PrintWriter printWriter = new PrintWriter(new BufferedOutputStream(
+                        new FileOutputStream(theFileToSave)));
                 printWriter.println("# Lines beginning with '#' are ignored");
                 printWriter.println("# Number of Vertices:");
                 final Collection<Vertex> vertices = Drawer.graph.getVertices();
@@ -93,6 +93,7 @@ public class FileOperations {
                         if (!line.startsWith("#")) {
                             final String[] sections = line.split(" ");
                             if (sections.length != 3) {
+                                input.close();
                                 throw new MalformedGraphException("Invalid vertex definition");
                             }
 
@@ -106,6 +107,7 @@ public class FileOperations {
 
                     // ensure we have the correct number of vertex definitions
                     if (Drawer.graph.getVertices().size() < numVertices) {
+                        input.close();
                         throw new MalformedGraphException("Missing vertex definition(s)");
                     }
 
@@ -118,21 +120,25 @@ public class FileOperations {
                             final int id = Integer.parseInt(sections[0]);
                             final Vertex vertex = Drawer.graph.getVertex(id);
                             if (vertex == null) {
-                                throw new MalformedGraphException("Invalid connection: vertex " +
-                                        "does not exist");
+                                input.close();
+                                throw new MalformedGraphException("Invalid connection: vertex "
+                                        + "does not exist");
                             }
 
                             for (int i = 1; i < sections.length; i++) {
                                 final int otherID = Integer.parseInt(sections[i]);
                                 final Vertex otherVertex = Drawer.graph.getVertex(otherID);
                                 if (otherVertex == null) {
-                                    throw new MalformedGraphException("Invalid connection: " +
-                                            "vertex does not exist");
+                                    input.close();
+                                    throw new MalformedGraphException("Invalid connection: "
+                                            + "vertex does not exist");
                                 }
                                 Drawer.graph.addConnection(vertex, otherVertex);
                             }
                         }
                     }
+
+                    input.close();
                 }
             }
         }
