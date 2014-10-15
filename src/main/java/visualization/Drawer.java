@@ -192,16 +192,18 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             graph.highlightRemovals(x, y);
         }
 
+        // Take into account the canvas movement when interacting with vertices
+        int trueX = x - canvasX;
+        int trueY = y - canvasY;
+
+        infoNode = null;
         for (Vertex v : graph.getVertices()) {
-            double distance = Math.sqrt(Math.pow(x - canvasX - v.getX(),
-                    2) + Math.pow(y - canvasY - v.getY(), 2));
-            if (distance < Vertex.getRadius()) {
+            if (v.distance(trueX, trueY) < Vertex.getRadius()) {
                 infoNode = v;
                 info.setPosition(x, y);
-                return;
+                break;
             }
         }
-        infoNode = null;
 
         repaint();
     }
@@ -218,6 +220,10 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     public void mousePressed(MouseEvent e) {
         int x = e.getX() - frame.getInsets().left;
         int y = e.getY() - frame.getInsets().top;
+
+        // Take into account the canvas movement when interacting with vertices
+        int trueX = x - canvasX;
+        int trueY = y - canvasY;
 
         mouseX = x;
         mouseY = y;
@@ -239,14 +245,15 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
+
+                    repaint();
+                    return;
                 }
             }
 
             if (mode == MouseMode.VERTEX) {
                 for (Vertex vertex : graph.getVertices()) {
-                    double distance = Math.sqrt(Math.pow(x - canvasX - vertex.getX(),
-                            2) + Math.pow(y - canvasY - vertex.getY(), 2));
-                    if (distance < Vertex.getRadius()) {
+                    if (vertex.distance(trueX, trueY) < Vertex.getRadius()) {
                         if (selectedVertex != null)//There already is a selected node
                         {
                             selectedVertex.deselect();
@@ -260,13 +267,11 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                         vertex.deselect();
                     }
                 }
-                graph.createVertex(x - canvasX, y - canvasY);
+                graph.createVertex(trueX, trueY);
                 checkConnected();
             } else if (mode == MouseMode.CONNECTION) {
                 for (Vertex v : graph.getVertices()) {
-                    double distance = Math.sqrt(Math.pow(x - canvasX - v.getX(),
-                            2) + Math.pow(y - canvasY - v.getY(), 2));
-                    if (distance < Vertex.getRadius()) {
+                    if (v.distance(trueX, trueY) < Vertex.getRadius()) {
                         if (selectedVertex != null)//There already is a selected node
                         {
                             selectedVertex.deselect();
@@ -287,7 +292,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                 }
             } else if (mode == MouseMode.REMOVE) {
                 // Remove the vertices and connections that are within range
-                graph.remove(mouseX, mouseY);
+                graph.remove(trueX, trueY);
             }
 
 
@@ -309,6 +314,10 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         mouseX = x;
         mouseY = y;
 
+        // Take into account the canvas movement when interacting with vertices
+        int trueX = x - canvasX;
+        int trueY = y - canvasY;
+
         if (e.getButton() == MouseEvent.BUTTON1) {
             // If the mouse release came after dragging the mouse
             if (dragged) {
@@ -327,7 +336,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                                 continue;
                             }
                             // If the cursor is within the vertex toggle a connection
-                            if (v.distance(x, y) < Vertex.getRadius()) {
+                            if (v.distance(trueX, trueY) < Vertex.getRadius()) {
                                 graph.toggleConnection(selectedVertex, v);
                                 //TODO do not perform this for directed graphs
                                 graph.toggleConnection(v, selectedVertex);
