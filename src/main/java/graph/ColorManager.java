@@ -43,7 +43,12 @@ class ColorManager {
         colors.add(Color.GREEN);
         colors.add(Color.YELLOW);
         colors.add(Color.MAGENTA);
-        colors.add(Color.ORANGE);
+        colors.add(new Color(230, 127, 60));
+        colors.add(Color.CYAN);
+        colors.add(Color.PINK);
+        colors.add(new Color(133, 35, 255));
+        colors.add(new Color(162, 233, 76));
+        colors.add(new Color(32, 77, 166));
     }
 
     /**
