@@ -176,7 +176,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
         if (mode == MouseMode.VERTEX) {
             if (selectedVertex != null) {
-                info.setPosition(x, y);
+                info.setPosition(getScreenPosition(e));
                 selectedVertex.setPosition(getCanvasPosition(e));
             }
         }
@@ -196,10 +196,6 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             }
         }
 
-        // Take into account the canvas movement when interacting with vertices
-        int trueX = x - canvasX;
-        int trueY = y - canvasY;
-
         // Highlight any vertices and connections that are within the removal range
         if (mode == MouseMode.REMOVE) {
             graph.highlightRemovals(getCanvasPosition(e));
@@ -209,7 +205,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         for (Vertex v : graph.getVertices()) {
             if (v.pointInVertex(getCanvasPosition(e))) {
                 infoNode = v;
-                info.setPosition(x, y);
+                info.setPosition(getScreenPosition(e));
                 break;
             }
         }
@@ -229,10 +225,6 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     public void mousePressed(MouseEvent e) {
         int x = e.getX() - frame.getInsets().left;
         int y = e.getY() - frame.getInsets().top;
-
-        // Take into account the canvas movement when interacting with vertices
-        int trueX = x - canvasX;
-        int trueY = y - canvasY;
 
         mouseX = x;
         mouseY = y;
@@ -322,10 +314,6 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
         mouseX = x;
         mouseY = y;
-
-        // Take into account the canvas movement when interacting with vertices
-        int trueX = x - canvasX;
-        int trueY = y - canvasY;
 
         if (e.getButton() == MouseEvent.BUTTON1) {
             // If the mouse release came after dragging the mouse
