@@ -200,16 +200,15 @@ public class Graph {
     }
 
     /**
-     * Marks all vertices and connections that are within range to be removed using the given x
-     * and y coordinates of the mouse.
+     * Marks all vertices and connections that are within range to be removed using the position
+     * of the mouse.
      *
-     * @param mouseX the x coordinate of the mouse
-     * @param mouseY the y coordinate of the mouse
+     * @param position the position of the mouse
      */
-    public void highlightRemovals(int mouseX, int mouseY) {
+    public void highlightRemovals(CanvasPosition position) {
         // Highlight all of the vertices that are in range
         for (Vertex vertex : vertexManager.getVertices()) {
-            if (vertex.pointInVertex(mouseX, mouseY)) {
+            if (vertex.pointInVertex(position)) {
                 vertex.select();
                 // Highlight all of the connections originating from the vertex because they will
                 // be removed as well
@@ -226,7 +225,7 @@ public class Graph {
 
         //Highlight all of the connections that are in range
         for (Connection connection : connectionManager.getConnections()) {
-            if (connection.distance(mouseX, mouseY) < REMOVAL_DISTANCE) {
+            if (connection.distance(position) < REMOVAL_DISTANCE) {
                 connection.select();
             } else {
                 connection.deselect();
@@ -235,17 +234,16 @@ public class Graph {
     }
 
     /**
-     * Removes all vertices and connections that are within range to be removed using the given x
-     * and y coordinates of the mouse.
+     * Removes all vertices and connections that are within range to be removed using the
+     * position of the mouse.
      *
-     * @param mouseX the x coordinate of the mouse
-     * @param mouseY the y coordinate of the mouse
+     * @param position the position of the mouse
      */
-    public void remove(int mouseX, int mouseY) {
+    public void remove(CanvasPosition position) {
         // Highlight all of the vertices that are in range
         final Set<Vertex> verticesToRemove = new HashSet<>();
         for (Vertex vertex : vertexManager.getVertices()) {
-            if (vertex.pointInVertex(mouseX, mouseY)) {
+            if (vertex.pointInVertex(position)) {
                 verticesToRemove.add(vertex);
             }
         }
@@ -256,7 +254,7 @@ public class Graph {
         //Highlight all of the connections that are in range
         final Set<Connection> connectionsToRemove = new HashSet<>();
         for (Connection connection : connectionManager.getConnections()) {
-            if (connection.distance(mouseX, mouseY) < REMOVAL_DISTANCE) {
+            if (connection.distance(position) < REMOVAL_DISTANCE) {
                 connectionsToRemove.add(connection);
             }
         }

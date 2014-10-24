@@ -44,9 +44,14 @@ public class Vertex implements Serializable {
         return selected;
     }
 
-    public void setPosition(int dx, int dy) {
-        x = dx;
-        y = dy;
+    /**
+     * Sets the position of the current vertex.
+     *
+     * @param position the new position of the vertex
+     */
+    public void setPosition(CanvasPosition position) {
+        x = position.getX();
+        y = position.getY();
     }
 
     public int getID() {
@@ -149,30 +154,28 @@ public class Vertex implements Serializable {
     }
 
     /**
-     * Returns the distance between the current vertex and the point represented by the given x
-     * and y coordinates.
+     * Returns the distance between the current vertex and the point represented by the given
+     * position.
      *
-     * @param x the x coordinate of the point
-     * @param y the y coordinate of the point
+     * @param position the given position
      *
-     * @return the distance between this vertex and the given point
+     * @return the distance between this vertex and the given position
      */
-    private double distance(int x, int y) {
-        final Point vertex = new Point(this.x, this.y);
-        final Point mouse = new Point(x, y);
+    private double distance(CanvasPosition position) {
+        final Point vertex = new Point(x, y);
+        final Point mouse = new Point(position.getX(), position.getY());
         return vertex.distance(mouse);
     }
 
     /**
-     * Returns whether the point represented by the given coordinates lies withing the current
+     * Returns whether the point represented by the given position lies withing the current
      * vertex.
      *
-     * @param x the x coordinate of the point
-     * @param y the y coordinate of the point
+     * @param position the given position
      *
-     * @return whether the point is within the vertex
+     * @return whether the position is within the vertex
      */
-    public boolean pointInVertex(int x, int y) {
-        return distance(x, y) < radius;
+    public boolean pointInVertex(CanvasPosition position) {
+        return distance(position) < radius;
     }
 }

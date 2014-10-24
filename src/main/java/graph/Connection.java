@@ -52,17 +52,16 @@ public class Connection {
     }
 
     /**
-     * Returns the distance between the given point and the line segment representing the
+     * Returns the distance between the given position and the line segment representing the current
      * connection.
      *
-     * @param x the x coordinate of the point
-     * @param y the y coordinate of the point
+     * @param position the position
      *
-     * @return the distance between the point and the line
+     * @return the distance between the position and the line
      */
-    public double distance(int x, int y) {
+    public double distance(CanvasPosition position) {
         final Line2D line = new Line2D.Double(start.getX(), start.getY(), end.getX(), end.getY());
-        return line.ptSegDist(x, y);
+        return line.ptSegDist(position.getX(), position.getY());
     }
 
     /**
