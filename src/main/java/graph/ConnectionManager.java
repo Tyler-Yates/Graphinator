@@ -141,7 +141,8 @@ class ConnectionManager {
     Set<Connection> getNeighborConnections(Vertex start) {
         final Set<Connection> neighborConnections = new HashSet<>();
         for (Connection connection : connections) {
-            if (connection.getStart().equals(start)) {
+            // TODO check if we are in a directed or undirected graph
+            if (connection.getStart().equals(start) || connection.getEnd().equals(start)) {
                 neighborConnections.add(connection);
             }
         }
