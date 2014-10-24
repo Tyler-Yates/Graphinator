@@ -1,5 +1,6 @@
 package visualization;
 
+import graph.CanvasPosition;
 import graph.Graph;
 import graph.Vertex;
 import util.Action;
@@ -275,7 +276,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                         vertex.deselect();
                     }
                 }
-                graph.createVertex(trueX, trueY);
+                graph.createVertex(getCanvasPosition(e));
                 checkConnected();
             } else if (mode == MouseMode.CONNECTION) {
                 for (Vertex v : graph.getVertices()) {
@@ -369,6 +370,38 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         }
 
         repaint();
+    }
+
+    /**
+     * Returns the position of the mouse represented by the given mouse event on the canvas. This
+     * position is affected by scrolling and is used by the graph to represent the true
+     * coordinates of vertices.
+     *
+     * @param e the mouse event
+     *
+     * @return the canvas position
+     */
+    private CanvasPosition getCanvasPosition(MouseEvent e) {
+        final ScreenPosition screenPosition = getScreenPosition(e);
+        final int x = screenPosition.getX() - canvasX;
+        final int y = screenPosition.getY() - canvasY;
+
+        return new CanvasPosition(x, y);
+    }
+
+    /**
+     * Returns the position of the mouse represented by the given mouse event on the screen. This
+     * position is used to draw elements on screen.
+     *
+     * @param e the mouse event
+     *
+     * @return the screen position
+     */
+    private ScreenPosition getScreenPosition(MouseEvent e) {
+        final int x = e.getX() - frame.getInsets().left;
+        final int y = e.getY() - frame.getInsets().top;
+
+        return new ScreenPosition(x, y);
     }
 
     public static void reset() {

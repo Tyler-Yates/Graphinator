@@ -35,29 +35,27 @@ class VertexManager {
     }
 
     /**
-     * Adds a vertex to the graph at the given x and y coordinates.
+     * Adds a vertex to the graph at the given position.
      *
-     * @param x the x coordinate of the vertex
-     * @param y the y coordinate of the vertex
+     * @param position the position of the vertex
      *
      * @return the unique ID assigned to the vertex
      */
-    int createVertex(int x, int y) {
+    int createVertex(CanvasPosition position) {
         final int vertexID = nextVertexIDToAssign++;
-        createVertex(vertexID, x, y);
+        createVertex(vertexID, position);
         graph.structurallyChanged();
         return vertexID;
     }
 
     /**
-     * Adds a vertex with the given unique ID to the graph at the given x and y coordinates.
+     * Adds a vertex with the given unique ID to the graph at the given position.
      *
      * @param id the unique ID of the vertex
-     * @param x the x coordinate of the vertex
-     * @param y the y coordinate of the vertex
+     * @param position the position of the vertex
      */
-    void createVertex(int id, int x, int y) {
-        final Vertex newVertex = new Vertex(id, x, y, graph);
+    void createVertex(int id, CanvasPosition position) {
+        final Vertex newVertex = new Vertex(id, position, graph);
         graph.structurallyChanged();
         vertices.put(id, newVertex);
     }

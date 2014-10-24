@@ -1,5 +1,6 @@
 package util;
 
+import graph.CanvasPosition;
 import graph.Vertex;
 import visualization.Drawer;
 
@@ -100,8 +101,8 @@ public class FileOperations {
                             final int id = Integer.parseInt(sections[0]);
                             final int x = Integer.parseInt(sections[1]);
                             final int y = Integer.parseInt(sections[2]);
-
-                            Drawer.graph.createVertex(id, x, y);
+                            final CanvasPosition vertexPosition = new CanvasPosition(x, y);
+                            Drawer.graph.createVertex(id, vertexPosition);
                         }
                     }
 

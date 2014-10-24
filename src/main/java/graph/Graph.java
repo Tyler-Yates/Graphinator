@@ -59,26 +59,24 @@ public class Graph {
     }
 
     /**
-     * Adds a vertex to the graph at the given x and y coordinates.
+     * Adds a vertex to the graph at the given position.
      *
-     * @param x the x coordinate of the vertex
-     * @param y the y coordinate of the vertex
+     * @param position the the position of the vertex
      *
      * @return the unique ID assigned to the vertex
      */
-    public int createVertex(int x, int y) {
-        return vertexManager.createVertex(x, y);
+    public int createVertex(CanvasPosition position) {
+        return vertexManager.createVertex(position);
     }
 
     /**
-     * Adds a vertex with the given unique ID to the graph at the given x and y coordinates.
+     * Adds a vertex with the given unique ID to the graph at the given position.
      *
      * @param id the unique ID of the vertex
-     * @param x the x coordinate of the vertex
-     * @param y the y coordinate of the vertex
+     * @param position the position of the vertex
      */
-    public void createVertex(int id, int x, int y) {
-        vertexManager.createVertex(id, x, y);
+    public void createVertex(int id, CanvasPosition position) {
+        vertexManager.createVertex(id, position);
     }
 
     /**

@@ -9,7 +9,7 @@ import java.util.Set;
 public class Vertex implements Serializable {
     private static final long serialVersionUID = 1122311460388446576L;
     private int color = 0;
-    private int drawX, drawY;
+    private int x, y;
     private final int id;
     private static final int radius = 10;
     private static final int diameter = radius * 2;
@@ -18,10 +18,17 @@ public class Vertex implements Serializable {
 
     private boolean selected = false;
 
-    Vertex(int id, int dx, int dy, Graph graph) {
+    /**
+     * Creates a new vertex with the given ID at the given position in the given graph.
+     *
+     * @param id the ID of the vertex
+     * @param position the position of the vertex
+     * @param graph the graph
+     */
+    Vertex(int id, CanvasPosition position, Graph graph) {
         this.id = id;
-        drawX = dx;
-        drawY = dy;
+        x = position.getX();
+        y = position.getY();
         this.graph = graph;
     }
 
@@ -38,8 +45,8 @@ public class Vertex implements Serializable {
     }
 
     public void setPosition(int dx, int dy) {
-        drawX = dx;
-        drawY = dy;
+        x = dx;
+        y = dy;
     }
 
     public int getID() {
@@ -67,11 +74,11 @@ public class Vertex implements Serializable {
     }
 
     public int getX() {
-        return drawX;
+        return x;
     }
 
     public int getY() {
-        return drawY;
+        return y;
     }
 
     public void draw(Graphics g, int cX, int cY) {
@@ -80,14 +87,14 @@ public class Vertex implements Serializable {
             c = Drawer.frame.getBackground();
         }
         g.setColor(c);
-        g.fillOval(drawX - radius + cX, drawY - radius + cY, diameter, diameter);
+        g.fillOval(x - radius + cX, y - radius + cY, diameter, diameter);
 
         if (selected) {
             g.setColor(Color.red);
         } else {
             g.setColor(Color.white);
         }
-        g.drawOval(drawX - radius + cX, drawY - radius + cY, diameter, diameter);
+        g.drawOval(x - radius + cX, y - radius + cY, diameter, diameter);
     }
 
     /**
@@ -151,7 +158,7 @@ public class Vertex implements Serializable {
      * @return the distance between this vertex and the given point
      */
     private double distance(int x, int y) {
-        final Point vertex = new Point(drawX, drawY);
+        final Point vertex = new Point(this.x, this.y);
         final Point mouse = new Point(x, y);
         return vertex.distance(mouse);
     }
