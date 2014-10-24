@@ -78,24 +78,33 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         buttons.clear();
         int x = frame.getInsets().left;
         int y = frame.getInsets().top;
-        ModeButton vertexButton = new ModeButton(MouseMode.VERTEX, frame.getWidth() - x - 200,
-                frame.getHeight() - y - 50, 100, 50, "Vertex");
+
+        final ScreenPosition vertexButtonPosition = new ScreenPosition(frame.getWidth() - x -
+                200, frame.getHeight() - y - 50);
+        final ModeButton vertexButton = new ModeButton(MouseMode.VERTEX, vertexButtonPosition,
+                100, 50, "Vertex");
         //The vertex button starts out as the selected button
         selectedButton = vertexButton;
         vertexButton.setButtonState(ButtonState.SELECTED);
-        ModeButton connectionButton = new ModeButton(MouseMode.CONNECTION,
-                frame.getWidth() - x - 100, frame.getHeight() - y - 50, 100, 50, "Connection");
-        ModeButton removeButton = new ModeButton(MouseMode.REMOVE, frame.getWidth() - x - 300,
-                frame.getHeight() - y - 50, 100, 50, "Remove");
-
+        final ScreenPosition connectionButtonPosition = new ScreenPosition(frame.getWidth() - x -
+                100, frame.getHeight() - y - 50);
+        final ModeButton connectionButton = new ModeButton(MouseMode.CONNECTION,
+                connectionButtonPosition, 100, 50, "Connection");
+        final ScreenPosition removeButtonPosition = new ScreenPosition(frame.getWidth() - x -
+                300, frame.getHeight() - y - 50);
+        final ModeButton removeButton = new ModeButton(MouseMode.REMOVE, removeButtonPosition,
+                100, 50, "Remove");
         buttons.add(vertexButton);
         buttons.add(connectionButton);
         buttons.add(removeButton);
 
-        ActionButton saveButton = new ActionButton(0, frame.getHeight() - y - 50, 100, 50,
-                "Save", Action.SAVE);
-        ActionButton loadButton = new ActionButton(100, frame.getHeight() - y - 50, 100, 50,
-                "Load", Action.LOAD);
+        final ScreenPosition saveButtonPosition = new ScreenPosition(0, frame.getHeight() - y - 50);
+        final ActionButton saveButton = new ActionButton(saveButtonPosition, 100, 50, "Save",
+                Action.SAVE);
+        final ScreenPosition loadButtonPosition = new ScreenPosition(100,
+                frame.getHeight() - y - 50);
+        final ActionButton loadButton = new ActionButton(loadButtonPosition, 100, 50, "Load",
+                Action.LOAD);
         buttons.add(saveButton);
         buttons.add(loadButton);
     }

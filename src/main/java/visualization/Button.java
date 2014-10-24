@@ -18,15 +18,14 @@ public abstract class Button {
     /**
      * Constructs a new button at the given location with the given size.
      *
-     * @param x the x position of the button
-     * @param y the y position of the button
+     * @param position the position of the button on screen
      * @param width the width of the button in pixels
      * @param height the height of the button in pixels
      * @param text the text of the button
      */
-    public Button(int x, int y, int width, int height, String text) {
-        this.x = x;
-        this.y = y;
+    public Button(ScreenPosition position, int width, int height, String text) {
+        this.x = position.getX();
+        this.y = position.getY();
         this.width = width;
         this.height = height;
         this.text = text;
