@@ -90,15 +90,15 @@ public abstract class Button {
     }
 
     /**
-     * Returns whether the given coordinate is within the bounds of the button.
+     * Returns whether the given position is within the bounds of the button.
      *
-     * @param cx the x position of the coordinate
-     * @param cy the y position of the coordinate
+     * @param position the position
      *
      * @return whether the coordinate is within the button
      */
-    public boolean contains(int cx, int cy) {
-        return cx > x && cx < x + width && cy > y && cy < y + height;
+    public boolean contains(ScreenPosition position) {
+        final Rectangle2D buttonBox = new Rectangle2D.Double(x, y, width, height);
+        return buttonBox.contains(position.getX(), position.getY());
     }
 
     /**

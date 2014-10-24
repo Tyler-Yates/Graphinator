@@ -185,11 +185,9 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     }
 
     public void mouseMoved(MouseEvent e) {
-        int x = e.getX() - frame.getInsets().left;
-        int y = e.getY() - frame.getInsets().top;
-
         for (Button button : buttons) {
-            if (button.getButtonState() != ButtonState.SELECTED && button.contains(x, y)) {
+            if (button.getButtonState() != ButtonState.SELECTED && button.contains
+                    (getScreenPosition(e))) {
                 button.setButtonState(ButtonState.HOVER);
             } else if (button.getButtonState() == ButtonState.HOVER) {
                 button.setButtonState(ButtonState.NORMAL);
@@ -223,15 +221,11 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     }
 
     public void mousePressed(MouseEvent e) {
-        int x = e.getX() - frame.getInsets().left;
-        int y = e.getY() - frame.getInsets().top;
-
-        mouseX = x;
-        mouseY = y;
+        updateMousePosition(e);
 
         if (e.getButton() == MouseEvent.BUTTON1) {
             for (Button button : buttons) {
-                if (button.contains(x, y)) {
+                if (button.contains(getScreenPosition(e))) {
                     //Only ModeButtons should be selected
                     if (button instanceof ModeButton) {
                         if (selectedButton != null) {
@@ -298,8 +292,9 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
 
         } else if (e.getButton() == MouseEvent.BUTTON3) {
-            originalMouseX = x;
-            originalMouseY = y;
+            //Right-mouse is used to drag the canvas around
+            originalMouseX = mouseX;
+            originalMouseY = mouseY;
             originalCanvasX = canvasX;
             originalCanvasY = canvasY;
             draggingCanvas = true;
@@ -309,11 +304,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     }
 
     public void mouseReleased(MouseEvent e) {
-        int x = e.getX() - frame.getInsets().left;
-        int y = e.getY() - frame.getInsets().top;
-
-        mouseX = x;
-        mouseY = y;
+        updateMousePosition(e);
 
         if (e.getButton() == MouseEvent.BUTTON1) {
             // If the mouse release came after dragging the mouse
@@ -390,6 +381,13 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         final int y = e.getY() - frame.getInsets().top;
 
         return new ScreenPosition(x, y);
+    }
+
+    private void updateMousePosition(MouseEvent e) {
+        final ScreenPosition screenPosition = getScreenPosition(e);
+
+        mouseX = screenPosition.getX();
+        mouseY = screenPosition.getY();
     }
 
     public static void reset() {
