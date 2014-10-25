@@ -20,30 +20,25 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
     private static final double VERSION = 0.1;
 
-    public static JFrame frame;
-    public static Graph graph = new Graph();
-    public static Vertex selectedVertex = null;
-    static Vertex infoNode = null;
-    static InfoPanel info = new InfoPanel();
+    private static JFrame frame;
+    private static Graph graph = new Graph();
+    private static Vertex selectedVertex = null;
+    private static Vertex infoNode = null;
+    private static final InfoPanel infoPanel = new InfoPanel();
 
-    static long dragTimer = -1;
+    private static boolean dragged = false;
+    private static boolean draggingCanvas = false;
+    private static long dragTimer = -1;
+    private static int canvasX = 0;
+    private static int canvasY = 0;
+    private static int originalCanvasX, originalCanvasY;
+    private static int mouseX, mouseY;
+    private static int originalMouseX, originalMouseY;
 
-    static int canvasX, canvasY;
-
-    static int mouseX, mouseY;
-
-    static boolean draggingCanvas = false;
-    static int originalCanvasX, originalCanvasY;
-    static int originalMouseX, originalMouseY;
-
-    public static MouseMode mode = MouseMode.VERTEX;
+    private static MouseMode mode = MouseMode.VERTEX;
     private static Button selectedButton;
-
-    static ArrayList<Button> buttons = new ArrayList<>();
-
-    static boolean dragged = false;
-
-    static Font drawFont = null;
+    private static final ArrayList<Button> buttons = new ArrayList<>();
+    private static final Font drawFont = new Font("Arial", Font.BOLD, 16);
 
     public Drawer() {
         frame = new JFrame("Graphinator v" + VERSION);
@@ -53,6 +48,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         frame.setBackground(Color.black);
         frame.addMouseMotionListener(this);
         frame.addMouseListener(this);
+        // Reposition the buttons when resizing the window
         frame.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -66,44 +62,70 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
     public static void main(String args[]) {
         new Drawer();
-        canvasX = canvasY = 0;
         initButtons();
+    }
 
-        drawFont = new Font("Arial", Font.BOLD, 16);
+    /**
+     * Returns the frame of the application.
+     *
+     * @return the frame
+     */
+    public static JFrame getFrame() {
+        return frame;
+    }
+
+    /**
+     * Returns the current graph of the application.
+     *
+     * @return the graph
+     */
+    public static Graph getGraph() {
+        return graph;
+    }
+
+    /**
+     * Returns the vertex to display information about.
+     *
+     * @return the vertex
+     */
+    public static Vertex getInfoNode() {
+        return infoNode;
     }
 
     public static void initButtons() {
         buttons.clear();
-        int x = frame.getInsets().left;
-        int y = frame.getInsets().top;
+        // Get the dimensions of the window border to calculate accurate coordinates on the screen
+        final int left = frame.getInsets().left;
+        final int top = frame.getInsets().top;
 
-        final ScreenPosition vertexButtonPosition = new ScreenPosition(frame.getWidth() - x -
-                200, frame.getHeight() - y - 50);
+        final ScreenPosition vertexButtonPosition = new ScreenPosition(frame.getWidth() - left -
+                200, frame.getHeight() - top - 50);
         final ModeButton vertexButton = new ModeButton(MouseMode.VERTEX, vertexButtonPosition,
                 100, 50, "Vertex");
+        buttons.add(vertexButton);
         //The vertex button starts out as the selected button
         selectedButton = vertexButton;
         vertexButton.setButtonState(ButtonState.SELECTED);
-        final ScreenPosition connectionButtonPosition = new ScreenPosition(frame.getWidth() - x -
-                100, frame.getHeight() - y - 50);
+        final ScreenPosition connectionButtonPosition = new ScreenPosition(frame.getWidth() - left -
+                100, frame.getHeight() - top - 50);
         final ModeButton connectionButton = new ModeButton(MouseMode.CONNECTION,
                 connectionButtonPosition, 100, 50, "Connection");
-        final ScreenPosition removeButtonPosition = new ScreenPosition(frame.getWidth() - x -
-                300, frame.getHeight() - y - 50);
+        buttons.add(connectionButton);
+        final ScreenPosition removeButtonPosition = new ScreenPosition(frame.getWidth() - left -
+                300, frame.getHeight() - top - 50);
         final ModeButton removeButton = new ModeButton(MouseMode.REMOVE, removeButtonPosition,
                 100, 50, "Remove");
-        buttons.add(vertexButton);
-        buttons.add(connectionButton);
         buttons.add(removeButton);
 
-        final ScreenPosition saveButtonPosition = new ScreenPosition(0, frame.getHeight() - y - 50);
+        final ScreenPosition saveButtonPosition = new ScreenPosition(0,
+                frame.getHeight() - top - 50);
         final ActionButton saveButton = new ActionButton(saveButtonPosition, 100, 50, "Save",
                 Action.SAVE);
+        buttons.add(saveButton);
         final ScreenPosition loadButtonPosition = new ScreenPosition(100,
-                frame.getHeight() - y - 50);
+                frame.getHeight() - top - 50);
         final ActionButton loadButton = new ActionButton(loadButtonPosition, 100, 50, "Load",
                 Action.LOAD);
-        buttons.add(saveButton);
         buttons.add(loadButton);
     }
 
@@ -113,19 +135,14 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         g.fillRect(0, 0, frame.getWidth(), frame.getHeight());
 
         g.setColor(Color.white);
-
+        // If the user is dragging a new connection show the connection preview
         if (mode == MouseMode.CONNECTION && selectedVertex != null) {
             g.drawLine(selectedVertex.getX() + canvasX, selectedVertex.getY() + canvasY, mouseX,
                     mouseY);
         }
 
-        graph.drawGraph(g, canvasX, canvasY);
-
-        for (Button b : buttons) {
-            b.draw(g);
-        }
-
-        if (graph != null && graph.getVertices() != null) {
+        if (graph != null) {
+            graph.drawGraph(g, canvasX, canvasY);
             g.setColor(frame.getBackground());
             g.fillRect(0, 0, 200, 150);
             g.setColor(Color.white);
@@ -139,25 +156,29 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             g.drawString("Tree: " + graph.properties().isTree(), 10, 140);
         }
 
-        info.draw(g);
+        for (Button b : buttons) {
+            b.draw(g);
+        }
+
+        infoPanel.draw(g);
     }
 
     public void mouseDragged(MouseEvent e) {
-        int x = e.getX() - frame.getInsets().left;
-        int y = e.getY() - frame.getInsets().top;
+        updateMousePosition(e);
+        final ScreenPosition screenPosition = getScreenPosition(e);
 
-        mouseX = x;
-        mouseY = y;
-
+        // If we are dragging the canvas update the position of the drag
         if (draggingCanvas) {
             infoNode = null;
-            canvasX = originalCanvasX - (originalMouseX - x);
-            canvasY = originalCanvasY - (originalMouseY - y);
+            canvasX = originalCanvasX - (originalMouseX - screenPosition.getX());
+            canvasY = originalCanvasY - (originalMouseY - screenPosition.getY());
         }
 
+        // If we have not started dragging the mouse add a delay to prevent unintended dragging
+        // by the user
         if (!dragged) {
             if (dragTimer == -1) {
-                dragTimer = 3;
+                dragTimer = 5;
             } else {
                 dragTimer--;
                 if (dragTimer == 0) {
@@ -166,9 +187,10 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             }
         }
 
+        // If we are in vertex mode update the position of the selected vertex
         if (mode == MouseMode.VERTEX) {
             if (selectedVertex != null) {
-                info.setPosition(getScreenPosition(e));
+                infoPanel.setPosition(getScreenPosition(e));
                 selectedVertex.setPosition(getCanvasPosition(e));
             }
         }
@@ -177,7 +199,10 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     }
 
     public void mouseMoved(MouseEvent e) {
+        // Update the buttons to reflect whether the mouse is over them
         for (Button button : buttons) {
+            // If the button is not already selected and the mouse is over it put it in the hover
+            // state
             if (button.getButtonState() != ButtonState.SELECTED && button.contains
                     (getScreenPosition(e))) {
                 button.setButtonState(ButtonState.HOVER);
@@ -191,11 +216,12 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             graph.highlightRemovals(getCanvasPosition(e));
         }
 
+        // Update the vertex to draw the info panel for
         infoNode = null;
-        for (Vertex v : graph.getVertices()) {
-            if (v.pointInVertex(getCanvasPosition(e))) {
-                infoNode = v;
-                info.setPosition(getScreenPosition(e));
+        for (Vertex vertex : graph.getVertices()) {
+            if (vertex.pointInVertex(getCanvasPosition(e))) {
+                infoNode = vertex;
+                infoPanel.setPosition(getScreenPosition(e));
                 break;
             }
         }
@@ -215,18 +241,23 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     public void mousePressed(MouseEvent e) {
         updateMousePosition(e);
 
+        // Left-mouse button
         if (e.getButton() == MouseEvent.BUTTON1) {
+            // See if any of the buttons were clicked
             for (Button button : buttons) {
                 if (button.contains(getScreenPosition(e))) {
-                    //Only ModeButtons should be selected
+                    // Only ModeButtons should be selected
                     if (button instanceof ModeButton) {
+                        // Deselect the currently selected button if there is one
                         if (selectedButton != null) {
                             selectedButton.setButtonState(ButtonState.NORMAL);
                         }
+                        // Set the new button as selected
                         button.setButtonState(ButtonState.SELECTED);
                         selectedButton = button;
                     }
 
+                    // Perform the button action if it has one
                     try {
                         button.perform();
                     } catch (Exception e1) {
@@ -240,41 +271,24 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
             if (mode == MouseMode.VERTEX) {
                 for (Vertex vertex : graph.getVertices()) {
+                    // Do not allow creating vertices on top of each other
                     if (vertex.pointInVertex(getCanvasPosition(e))) {
-                        if (selectedVertex != null)//There already is a selected node
-                        {
-                            selectedVertex.deselect();
-                            selectedVertex = null;
-                        }
+                        // The vertex may be dragged to alter its position
                         selectedVertex = vertex;
                         vertex.select();
                         return;
                     }
-                    if (vertex.isSelected()) {
-                        vertex.deselect();
-                    }
                 }
                 graph.createVertex(getCanvasPosition(e));
             } else if (mode == MouseMode.CONNECTION) {
-                for (Vertex v : graph.getVertices()) {
-                    if (v.pointInVertex(getCanvasPosition(e))) {
-                        if (selectedVertex != null)//There already is a selected node
-                        {
-                            selectedVertex.deselect();
-                            selectedVertex = null;
-                        }
-                        selectedVertex = v;
-                        v.select();
+                // See if we are creating a connection between vertices
+                for (Vertex vertex : graph.getVertices()) {
+                    if (vertex.pointInVertex(getCanvasPosition(e))) {
+                        // Set the vertex as the starting vertex for the connection
+                        selectedVertex = vertex;
+                        vertex.select();
                         return;
                     }
-                    if (v.isSelected()) {
-                        v.deselect();
-                    }
-                }
-                if (selectedVertex != null)//There already is a selected node
-                {
-                    selectedVertex.deselect();
-                    selectedVertex = null;
                 }
             } else if (mode == MouseMode.REMOVE) {
                 // Remove the vertices and connections that are within range
@@ -301,31 +315,33 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             // If the mouse release came after dragging the mouse
             if (dragged) {
                 if (mode == MouseMode.VERTEX) {
-                    // Deselect the vertex that was dragged
+                    // Deselect the vertex that was being dragged
                     if (selectedVertex != null) {
                         selectedVertex.deselect();
+                        selectedVertex = null;
                     }
-                    selectedVertex = null;
                 } else if (mode == MouseMode.CONNECTION) {
                     // If we were dragging a connection from a vertex
                     if (selectedVertex != null) {
-                        for (Vertex v : graph.getVertices()) {
+                        for (Vertex vertex : graph.getVertices()) {
                             // Skip the selected vertex as we don't want to have self-loops
-                            if (v.equals(selectedVertex)) {
+                            if (vertex.equals(selectedVertex)) {
                                 continue;
                             }
                             // If the cursor is within the vertex toggle a connection
-                            if (v.pointInVertex(getCanvasPosition(e))) {
-                                graph.toggleConnection(selectedVertex, v);
+                            if (vertex.pointInVertex(getCanvasPosition(e))) {
+                                graph.toggleConnection(selectedVertex, vertex);
                                 //TODO do not perform this for directed graphs
-                                graph.toggleConnection(v, selectedVertex);
+                                graph.toggleConnection(vertex, selectedVertex);
+
                                 selectedVertex = null;
                                 graph.removeHighlights();
                                 repaint();
                                 return;
                             }
                         }
-                        // If there is no vertex to toggle a connection with deselect the vertex
+                        // If there is no vertex to create the connection with terminate the
+                        // connection
                         if (selectedVertex != null) {
                             selectedVertex.deselect();
                             selectedVertex = null;
@@ -333,9 +349,11 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                     }
                 }
             }
+            // We are no longer dragging
             dragged = false;
             dragTimer = -1;
         } else if (e.getButton() == MouseEvent.BUTTON3) {
+            // We are no longer dragging
             draggingCanvas = false;
         }
 
@@ -381,9 +399,26 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         mouseY = screenPosition.getY();
     }
 
+    /**
+     * Sets the mouse mode of the program.
+     *
+     * @param mode the mouse mode
+     */
+    public static void setMouseMode(MouseMode mode) {
+        Drawer.mode = mode;
+    }
+
+    /**
+     * Resets the graph by removing all vertices and connections.
+     */
     public static void reset() {
         graph = new Graph();
         infoNode = null;
         selectedVertex = null;
+
+        canvasX = 0;
+        canvasY = 0;
+        dragged = false;
+        draggingCanvas = false;
     }
 }

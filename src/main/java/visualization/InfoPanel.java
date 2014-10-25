@@ -1,5 +1,7 @@
 package visualization;
 
+import graph.Vertex;
+
 import java.awt.*;
 
 /**
@@ -31,15 +33,16 @@ public class InfoPanel {
         g.setFont(new Font("Arial", Font.PLAIN, 12));
 
         // Don't draw if we don't have a node to get information from
-        if (Drawer.infoNode == null) {
+        final Vertex infoNode = Drawer.getInfoNode();
+        if (infoNode == null) {
             return;
         }
 
         g.setColor(backgroundColor);
         g.fillRect(x, y, width, height);
         g.setColor(Color.black);
-        g.drawString("Vertex ID: " + Drawer.infoNode.getID(), x + 2, y + 12);
-        g.drawString("Color: " + Drawer.infoNode.getColor(), x + 2, y + 27);
-        g.drawString("Degree: " + Drawer.infoNode.getDegree(), x + 2, y + 42);
+        g.drawString("Vertex ID: " + infoNode.getID(), x + 2, y + 12);
+        g.drawString("Color: " + infoNode.getColor(), x + 2, y + 27);
+        g.drawString("Degree: " + infoNode.getDegree(), x + 2, y + 42);
     }
 }

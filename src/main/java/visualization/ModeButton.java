@@ -34,6 +34,6 @@ public class ModeButton extends Button {
 
     @Override
     public void perform() throws Exception {
-        Drawer.mode = mode;
+        Drawer.setMouseMode(mode);
     }
 }

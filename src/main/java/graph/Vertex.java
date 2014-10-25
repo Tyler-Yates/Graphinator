@@ -89,7 +89,7 @@ public class Vertex implements Serializable {
     public void draw(Graphics g, int cX, int cY) {
         Color c = graph.getColorManager().getColor(color);
         if (c == null) {
-            c = Drawer.frame.getBackground();
+            c = Drawer.getFrame().getBackground();
         }
         g.setColor(c);
         g.fillOval(x - radius + cX, y - radius + cY, diameter, diameter);
