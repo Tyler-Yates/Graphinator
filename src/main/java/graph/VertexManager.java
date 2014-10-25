@@ -79,7 +79,6 @@ class VertexManager {
         if (vertexToRemove != null) {
             removeVertex(vertexToRemove);
         }
-        graph.structurallyChanged();
         return vertexToRemove;
     }
 
