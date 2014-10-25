@@ -49,15 +49,20 @@ class VertexManager {
     }
 
     /**
-     * Adds a vertex with the given unique ID to the graph at the given position.
+     * Adds a vertex with the given unique ID to the graph at the given position. If a vertex
+     * with the given ID already exists in the graph the new vertex will overwrite it and the
+     * original vertex will be returned.
      *
      * @param id the unique ID of the vertex
      * @param position the position of the vertex
+     *
+     * @return the vertex with the given ID that already existed in the graph or null if no
+     * vertex with the given ID existed
      */
-    void createVertex(int id, CanvasPosition position) {
+    Vertex createVertex(int id, CanvasPosition position) {
         final Vertex newVertex = new Vertex(id, position, graph);
         graph.structurallyChanged();
-        vertices.put(id, newVertex);
+        return vertices.put(id, newVertex);
     }
 
     /**
