@@ -88,7 +88,10 @@ class ColorManager {
      * Assigns colors to all of the vertices in the graph.
      */
     void assignColors() {
-        if(graph.getVertexManager().numberOfVertices() == 0) {
+        // Assume the graph is connected. This property will be checked in the process of
+        // coloring vertices.
+        graph.properties().graphIsConnected();
+        if (graph.getVertexManager().numberOfVertices() == 0) {
             return;
         }
 
@@ -103,6 +106,9 @@ class ColorManager {
         processFromVertex(vertexIterator.next(), verticesWithColorAssigned);
 
         // If there are still vertices we have not assigned colors to then the graph is unconnected
+        if (verticesWithColorAssigned.size() < graph.getVertexManager().numberOfVertices()) {
+            graph.properties().graphIsDisconnected();
+        }
         while (verticesWithColorAssigned.size() < graph.getVertexManager().numberOfVertices()) {
             final Vertex vertex = vertexIterator.next();
             if (!verticesWithColorAssigned.contains(vertex)) {

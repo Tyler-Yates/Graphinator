@@ -15,7 +15,7 @@ public class Graph {
     private final VertexManager vertexManager = new VertexManager(this);
     private final VertexVisualizer vertexVisualizer = new VertexVisualizer(vertexManager);
     private final ColorManager colorManager = new ColorManager(this);
-    private final PropertyFinder propertyFinder = new PropertyFinder(this);
+    private final PropertyManager propertyManager = new PropertyManager(this);
 
     private boolean structureChanged = false;
 
@@ -33,8 +33,8 @@ public class Graph {
         return colorManager;
     }
 
-    public PropertyFinder getPropertyFinder() {
-        return propertyFinder;
+    public PropertyManager properties() {
+        return propertyManager;
     }
 
     /**
@@ -165,6 +165,7 @@ public class Graph {
             // We need to reassign colors because the modified structure of the graph may cause a
             // new coloring
             colorManager.assignColors();
+            propertyManager.calculateProperties();
         }
 
         structureChanged = false;

@@ -45,9 +45,6 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
     static Font drawFont = null;
 
-    static boolean isConnected = true;
-    static boolean isTree = true;
-
     public Drawer() {
         frame = new JFrame("Graphinator v" + VERSION);
         frame.setVisible(true);
@@ -136,18 +133,13 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             //TODO For directed graphs don't divide by two
             g.drawString("Number of Connections: " + graph.numberOfConnections() / 2, 10, 40);
             g.drawString("Number of Colors: " + graph.numberOfColors(), 10, 60);
-            g.drawString("Maximum Degree: " + graph.getPropertyFinder().maxDegree(graph), 10, 80);
-            g.drawString("Bipartite: " + graph.getPropertyFinder().isBipartite(), 10, 100);
-            g.drawString("Connected: " + isConnected, 10, 120);
-            g.drawString("Tree: " + isTree, 10, 140);
+            g.drawString("Maximum Degree: " + graph.properties().getMaxDegree(), 10, 80);
+            g.drawString("Bipartite: " + graph.properties().isBipartite(), 10, 100);
+            g.drawString("Connected: " + graph.properties().isConnected(), 10, 120);
+            g.drawString("Tree: " + graph.properties().isTree(), 10, 140);
         }
 
         info.draw(g);
-    }
-
-    private static void checkConnected() {
-        isConnected = graph.getPropertyFinder().isConnected(graph);
-        isTree = graph.getPropertyFinder().isTree(graph);
     }
 
     public void mouseDragged(MouseEvent e) {
@@ -263,7 +255,6 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                     }
                 }
                 graph.createVertex(getCanvasPosition(e));
-                checkConnected();
             } else if (mode == MouseMode.CONNECTION) {
                 for (Vertex v : graph.getVertices()) {
                     if (v.pointInVertex(getCanvasPosition(e))) {
@@ -394,7 +385,5 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         graph = new Graph();
         infoNode = null;
         selectedVertex = null;
-        isTree = true;
-        isConnected = true;
     }
 }

@@ -1,89 +1,93 @@
 package graph;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-
-public class PropertyFinder {
+/**
+ * Used to detect and report the properties of a graph.
+ */
+public class PropertyManager {
 
     private final Graph graph;
 
-    static boolean tempCycle = false;
+    private int maxDegree = 0;
+    private boolean bipartite = false;
+    private boolean tree = false;
+    private boolean connected = true;
+
+    //static boolean tempCycle = false;
 
     /**
-     * Constructs a property finder for the given graph.
+     * Constructs a property manager for the given graph.
      *
      * @param graph the given graph
      */
-    public PropertyFinder(Graph graph) {
+    public PropertyManager(Graph graph) {
         this.graph = graph;
     }
 
-    public int maxDegree(Graph g) {
-        Collection<Vertex> vertices;
-        int max, numEdges, numVertices;
+    void graphIsConnected() {
+        connected = true;
+    }
 
-        vertices = g.getVertices();
-        numVertices = g.numberOfVertices();
-        max = 0;
+    void graphIsDisconnected() {
+        connected = false;
+    }
 
-        for (Vertex vertex : vertices) {
-            numEdges = vertex.getDegree();
-            if (numEdges > max) {
-                max = numEdges;
+    private void calculateMaxDegree() {
+        int max = 0;
+        for (Vertex vertex : graph.getVertices()) {
+            if (vertex.getDegree() > max) {
+                max = vertex.getDegree();
             }
         }
 
-        return max;
+        maxDegree = max;
     }
 
+    /**
+     * Returns the maximum degree of any of the vertices of the graph.
+     *
+     * @return the maximum degree
+     */
+    public int getMaxDegree() {
+        return maxDegree;
+    }
+
+    public void calculateBipartite() {
+        bipartite = graph.numberOfColors() <= 2;
+    }
+
+    /**
+     * Returns whether the graph is bipartite.
+     *
+     * @return whether the graph is bipartite
+     */
     public boolean isBipartite() {
-        return graph.getColorManager().numberOfColors() <= 2;
+        return bipartite;
     }
 
-    public boolean isConnected(Graph g) {
-        if (g.numberOfVertices() == 0) {
-            return true;
-        }
-
-        final Set<Vertex> visited = new HashSet<>();
-        Vertex v = g.getVertex(0);
-        connectedH(visited, v);
-
-        return visited.size() == g.numberOfVertices();
+    /**
+     * Returns whether the graph is connected.
+     *
+     * @return whether the graph is connected
+     */
+    public boolean isConnected() {
+        return connected;
     }
 
-    public void connectedH(Set<Vertex> visited, Vertex v) {
-        if (visited.contains(v)) {
-            return;
-        }
-
-        visited.add(v);
-        for (Vertex temp : v.getNeighbors()) {
-            connectedH(visited, temp);
-        }
-
+    public void calculateTree() {
+        // TODO fix definition for directed graphs
+        tree = isConnected() && graph.numberOfConnections() / 2 == graph.numberOfVertices() - 1;
     }
 
-
-    public boolean isTree(Graph g) {
-        tempCycle = false;
-        if (g.numberOfConnections() / 2 != g.numberOfVertices() - 1) {
-            return false;
-        }
-        for (Vertex v : g.getVertices()) {
-            ArrayList<Vertex> visited = new ArrayList<Vertex>();
-            cycleExists(v, v, null, visited);
-            if (tempCycle) {
-                return false;
-            }
-        }
-        return true;
+    /**
+     * Returns whether the graph is a tree.
+     *
+     * @return whether the graph is a tree
+     */
+    public boolean isTree() {
+        return tree;
     }
 
-    private void cycleExists(Vertex original, Vertex parent, Vertex v, ArrayList<Vertex> visited) {
+    /*private void cycleExists(Vertex original, Vertex parent, Vertex v, ArrayList<Vertex> visited) {
         if (tempCycle) {
             return;
         }
@@ -143,5 +147,11 @@ public class PropertyFinder {
                 findCircuitsHelper(v, original, currentPath, connections, ans);
             }
         }
+    }*/
+
+    void calculateProperties() {
+        calculateMaxDegree();
+        calculateTree();
+        calculateBipartite();
     }
 }
