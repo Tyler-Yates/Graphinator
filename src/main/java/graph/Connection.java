@@ -42,15 +42,6 @@ public class Connection {
         return end;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof Connection) {
-            final Connection other = (Connection) o;
-            return start.equals(other.start) && end.equals(other.end);
-        }
-        return false;
-    }
-
     /**
      * Returns the distance between the given position and the line segment representing the current
      * connection.
@@ -96,7 +87,21 @@ public class Connection {
                 end.getY() + canvasY);
     }
 
+    /**
+     * Returns whether the current connection is selected.
+     *
+     * @return whether the current connection is selected
+     */
     public boolean isSelected() {
         return selected;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Connection) {
+            final Connection other = (Connection) o;
+            return start.equals(other.start) && end.equals(other.end);
+        }
+        return false;
     }
 }
