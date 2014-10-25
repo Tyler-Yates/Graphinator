@@ -3,20 +3,21 @@ package graph;
 import visualization.Drawer;
 
 import java.awt.*;
-import java.io.Serializable;
 import java.util.Set;
 
-public class Vertex implements Serializable {
-    private static final long serialVersionUID = 1122311460388446576L;
-    private int color = 0;
-    private int x, y;
+/**
+ * Represents a vertex in the graph.
+ */
+public class Vertex {
     private final int id;
-    private static final int radius = 10;
-    private static final int diameter = radius * 2;
-
     private final Graph graph;
 
-    private boolean selected = false;
+    private int color = 0;
+    private int x, y;
+    private boolean selected;
+
+    private static final int radius = 10;
+    private static final int diameter = radius * 2;
 
     /**
      * Creates a new vertex with the given ID at the given position in the given graph.
@@ -32,14 +33,43 @@ public class Vertex implements Serializable {
         this.graph = graph;
     }
 
+    /**
+     * Returns the ID of the current vertex.
+     *
+     * @return the ID
+     */
+    public int getID() {
+        return id;
+    }
+
+    /**
+     * Returns the color of the current vertex.
+     *
+     * @return the color of the vertex
+     */
+    public int getColor() {
+        return color;
+    }
+
+    /**
+     * Selects the given vertex
+     */
     public void select() {
         selected = true;
     }
 
+    /**
+     * Deselects the given vertex
+     */
     public void deselect() {
         selected = false;
     }
 
+    /**
+     * Returns whether the current vertex is selected.
+     *
+     * @return whether the current vertex is selected
+     */
     public boolean isSelected() {
         return selected;
     }
@@ -54,39 +84,72 @@ public class Vertex implements Serializable {
         y = position.getY();
     }
 
-    public int getID() {
-        return id;
-    }
-
+    /**
+     * Returns whether the given vertex is equal to the current vertex. Equality is based on the
+     * unique identifier assigned to each vertex.
+     *
+     * @param other the given vertex
+     *
+     * @return whether the two vertices are equal
+     */
     public boolean equals(Vertex other) {
         return getID() == other.getID();
     }
 
+    /**
+     * Adds a connection between this vertex and the given vertex.
+     *
+     * @param end the given vertex
+     */
     public void addConnection(Vertex end) {
         graph.getConnectionManager().addConnection(this, end);
     }
 
-    public int getColor() {
-        return color;
+    /**
+     * Sets the color of the current vertex.
+     *
+     * @param color the color to set
+     */
+    public void setColor(int color) {
+        this.color = color;
     }
 
-    public void setColor(int colorValue) {
-        color = colorValue;
-    }
-
+    /**
+     * Returns the neighbors of the current vertex.
+     *
+     * @return the neighbors
+     */
     public Set<Vertex> getNeighbors() {
         return graph.getConnectionManager().getNeighbors(this);
     }
 
+    /**
+     * Returns the x coordinate of the current vertex in the canvas.
+     *
+     * @return the x coordinate
+     */
     public int getX() {
         return x;
     }
 
+    /**
+     * Returns the y coordinate of the current vertex in the canvas.
+     *
+     * @return the y coordinate
+     */
     public int getY() {
         return y;
     }
 
+    /**
+     * Draws the current vertex to the given canvas taking into account the given canvas shift.
+     *
+     * @param g the canvas
+     * @param cX the canvas shift in the x direction
+     * @param cY the canvas shift in the y direction
+     */
     public void draw(Graphics g, int cX, int cY) {
+        // Determine which color we should draw the vertex with
         Color c = graph.getColorManager().getColor(color);
         if (c == null) {
             c = Drawer.getFrame().getBackground();
@@ -94,6 +157,7 @@ public class Vertex implements Serializable {
         g.setColor(c);
         g.fillOval(x - radius + cX, y - radius + cY, diameter, diameter);
 
+        // Highlight the edge of the vertex if it is selected
         if (selected) {
             g.setColor(Color.red);
         } else {
@@ -109,10 +173,6 @@ public class Vertex implements Serializable {
      */
     public int getDegree() {
         return graph.getConnectionManager().getNeighbors(this).size();
-    }
-
-    public String toString() {
-        return "" + getID();
     }
 
     /**
@@ -148,11 +208,6 @@ public class Vertex implements Serializable {
         return graph.getConnectionManager().verticesConnected(this, other);
     }
 
-    @Override
-    public int hashCode() {
-        return id;
-    }
-
     /**
      * Returns the distance between the current vertex and the point represented by the given
      * position.
@@ -177,5 +232,14 @@ public class Vertex implements Serializable {
      */
     public boolean pointInVertex(CanvasPosition position) {
         return distance(position) < radius;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
+
+    public String toString() {
+        return "" + getID();
     }
 }
