@@ -1,6 +1,7 @@
 package graph;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.geom.Line2D;
 
 /**
@@ -94,6 +95,11 @@ public class Connection {
      */
     public boolean isSelected() {
         return selected;
+    }
+
+    @Override
+    public int hashCode() {
+        return start.hashCode() ^ end.hashCode();
     }
 
     @Override
