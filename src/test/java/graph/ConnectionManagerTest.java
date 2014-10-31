@@ -3,8 +3,11 @@ package graph;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Set;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings("JavaDoc")
@@ -84,6 +87,33 @@ public class ConnectionManagerTest {
         assertVerticesNotConnected(start, end2);
         assertVerticesNotConnected(end, start);
         assertVerticesConnected(end, end2);
+    }
+
+    @Test
+    public void testGetNeighbors() {
+        final Vertex end2 = createVertex();
+        connectionManager.addConnection(start, end);
+        connectionManager.addConnection(end, end2);
+        connectionManager.addConnection(end2, start);
+
+        // Only end is a neighbor of start
+        final Set<Vertex> neighbors = connectionManager.getNeighbors(start);
+        assertEquals(1, neighbors.size());
+        assertSame(end, neighbors.iterator().next());
+    }
+
+    @Test
+    public void testGetVertexConnections() {
+        final Vertex end2 = createVertex();
+        connectionManager.addConnection(start, end);
+        connectionManager.addConnection(end, end2);
+        connectionManager.addConnection(end2, start);
+
+        // Only two connections involve start as an endpoint
+        final Set<Connection> vertexConnections = connectionManager.getVertexConnections(start);
+        assertEquals(2, vertexConnections.size());
+        assertTrue(vertexConnections.contains(new Connection(start, end)));
+        assertTrue(vertexConnections.contains(new Connection(end2, start)));
     }
 
     private void assertVerticesConnected(Vertex v1, Vertex v2) {
