@@ -33,9 +33,9 @@ public class ConnectionManagerTest {
         assertEquals(1, connectionManager.numConnections());
 
         // There is a connection from start to end
-        assertTrue(connectionManager.verticesConnected(start, end));
+        assertVerticesConnected(start, end);
         // But NOT from end to start
-        assertFalse(connectionManager.verticesConnected(end, start));
+        assertVerticesNotConnected(end, start);
     }
 
     @Test
@@ -44,29 +44,54 @@ public class ConnectionManagerTest {
         connectionManager.addConnection(start, end);
         connectionManager.addConnection(end, start);
         assertEquals(2, connectionManager.numConnections());
-        assertTrue(connectionManager.verticesConnected(start, end));
-        assertTrue(connectionManager.verticesConnected(end, start));
+        assertVerticesConnected(start, end);
+        assertVerticesConnected(end, start);
 
         // Now remove the connection from start to end
         connectionManager.removeConnection(start, end);
         // There should only remain a single connection from end to start
         assertEquals(1, connectionManager.numConnections());
-        assertFalse(connectionManager.verticesConnected(start, end));
-        assertTrue(connectionManager.verticesConnected(end, start));
+        assertVerticesNotConnected(start, end);
+        assertVerticesConnected(end, start);
     }
 
     @Test
     public void testToggleConnection() {
         connectionManager.addConnection(start, end);
-        assertTrue(connectionManager.verticesConnected(start, end));
+        assertVerticesConnected(start, end);
 
         // Vertices are connected so toggling should remove the connection
         connectionManager.toggleConnection(start, end);
-        assertFalse(connectionManager.verticesConnected(start, end));
+        assertVerticesNotConnected(start, end);
 
         // And toggling again should add the connection once more
         connectionManager.toggleConnection(start, end);
-        assertTrue(connectionManager.verticesConnected(start, end));
+        assertVerticesConnected(start, end);
+    }
+
+    @Test
+    public void testRemoveVertex() {
+        final Vertex end2 = createVertex();
+        connectionManager.addConnection(start, end);
+        connectionManager.addConnection(start, end2);
+        connectionManager.addConnection(end, start);
+        connectionManager.addConnection(end, end2);
+
+        // Removing start should leave only a single connection from end to end2
+        connectionManager.removeVertex(start);
+        assertEquals(1, connectionManager.numConnections());
+        assertVerticesNotConnected(start, end);
+        assertVerticesNotConnected(start, end2);
+        assertVerticesNotConnected(end, start);
+        assertVerticesConnected(end, end2);
+    }
+
+    private void assertVerticesConnected(Vertex v1, Vertex v2) {
+        assertTrue(connectionManager.verticesConnected(v1, v2));
+    }
+
+    private void assertVerticesNotConnected(Vertex v1, Vertex v2) {
+        assertFalse(connectionManager.verticesConnected(v1, v2));
     }
 
     private Vertex createVertex() {
