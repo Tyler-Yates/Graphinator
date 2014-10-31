@@ -13,18 +13,21 @@ public class ConnectionManagerTest {
     private VertexManager vertexManager;
     private ConnectionManager connectionManager;
 
+    private Vertex start;
+    private Vertex end;
+
     @Before
     public void init() {
         Graph graph = new Graph();
         vertexManager = graph.getVertexManager();
         connectionManager = graph.getConnectionManager();
+
+        start = createVertex();
+        end = createVertex();
     }
 
     @Test
     public void testAddConnection() {
-        final Vertex start = createVertex();
-        final Vertex end = createVertex();
-
         // Connect start to end
         connectionManager.addConnection(start, end);
         assertEquals(1, connectionManager.numConnections());
@@ -33,6 +36,37 @@ public class ConnectionManagerTest {
         assertTrue(connectionManager.verticesConnected(start, end));
         // But NOT from end to start
         assertFalse(connectionManager.verticesConnected(end, start));
+    }
+
+    @Test
+    public void testRemoveConnection() {
+        // Connect start to end and end to start
+        connectionManager.addConnection(start, end);
+        connectionManager.addConnection(end, start);
+        assertEquals(2, connectionManager.numConnections());
+        assertTrue(connectionManager.verticesConnected(start, end));
+        assertTrue(connectionManager.verticesConnected(end, start));
+
+        // Now remove the connection from start to end
+        connectionManager.removeConnection(start, end);
+        // There should only remain a single connection from end to start
+        assertEquals(1, connectionManager.numConnections());
+        assertFalse(connectionManager.verticesConnected(start, end));
+        assertTrue(connectionManager.verticesConnected(end, start));
+    }
+
+    @Test
+    public void testToggleConnection() {
+        connectionManager.addConnection(start, end);
+        assertTrue(connectionManager.verticesConnected(start, end));
+
+        // Vertices are connected so toggling should remove the connection
+        connectionManager.toggleConnection(start, end);
+        assertFalse(connectionManager.verticesConnected(start, end));
+
+        // And toggling again should add the connection once more
+        connectionManager.toggleConnection(start, end);
+        assertTrue(connectionManager.verticesConnected(start, end));
     }
 
     private Vertex createVertex() {
