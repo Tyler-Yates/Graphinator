@@ -51,7 +51,7 @@ public class PropertyManager {
         return maxDegree;
     }
 
-    public void calculateBipartite() {
+    private void calculateBipartite() {
         bipartite = graph.numberOfColors() <= 2;
     }
 
@@ -73,7 +73,7 @@ public class PropertyManager {
         return connected;
     }
 
-    public void calculateTree() {
+    private void calculateTree() {
         // TODO fix definition for directed graphs
         tree = isConnected() && graph.numberOfConnections() / 2 == graph.numberOfVertices() - 1;
     }
