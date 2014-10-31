@@ -112,8 +112,8 @@ class ConnectionManager {
     }
 
     /**
-     * Returns the neighbors of the given vertex. If the vertex has no neighbors an empty set
-     * will be returned.
+     * Returns the neighbors of the given vertex. If the vertex has no neighbors an empty set will
+     * be returned.
      *
      * @param start the starting vertex
      *
@@ -131,18 +131,17 @@ class ConnectionManager {
     }
 
     /**
-     * Returns the connections of the given vertex. If the vertex has no neighbors an empty set
-     * will be returned.
+     * Returns the connections that involve the given vertex either as the starting vertex of the
+     * connection or the ending vertex of the connection.
      *
-     * @param start the starting vertex
+     * @param vertex the vertex
      *
      * @return the connections of the vertex
      */
-    Set<Connection> getNeighborConnections(Vertex start) {
+    Set<Connection> getVertexConnections(Vertex vertex) {
         final Set<Connection> neighborConnections = new HashSet<>();
         for (Connection connection : connections) {
-            // TODO check if we are in a directed or undirected graph
-            if (connection.getStart().equals(start) || connection.getEnd().equals(start)) {
+            if (connection.getStart().equals(vertex) || connection.getEnd().equals(vertex)) {
                 neighborConnections.add(connection);
             }
         }

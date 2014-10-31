@@ -1,6 +1,6 @@
 package graph;
 
-import java.awt.*;
+import java.awt.Graphics;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -80,8 +80,8 @@ public class Graph {
     }
 
     /**
-     * Removes the given vertex from the graph. This also removes all edges
-     * associated with that vertex in the graph.
+     * Removes the given vertex from the graph. This also removes all edges associated with that
+     * vertex in the graph.
      *
      * @param vertexToRemove the vertex to remove
      */
@@ -156,8 +156,8 @@ public class Graph {
     }
 
     /**
-     * Checks whether the graph has been modified structurally and if so takes appropriate
-     * actions to ensure that the graph properties are maintained.
+     * Checks whether the graph has been modified structurally and if so takes appropriate actions
+     * to ensure that the graph properties are maintained.
      */
     private void checkForStructuralChanges() {
         // If the graph has been modified we need to update properties
@@ -201,8 +201,8 @@ public class Graph {
     }
 
     /**
-     * Marks all vertices and connections that are within range to be removed using the position
-     * of the mouse.
+     * Marks all vertices and connections that are within range to be removed using the position of
+     * the mouse.
      *
      * @param position the position of the mouse
      */
@@ -213,7 +213,7 @@ public class Graph {
                 vertex.select();
                 // Highlight all of the connections originating from the vertex because they will
                 // be removed as well
-                for (Connection connection : connectionManager.getNeighborConnections(vertex)) {
+                for (Connection connection : connectionManager.getVertexConnections(vertex)) {
                     connection.select();
                 }
                 // If the user removes a vertex we will remove all edges as well so don't worry
@@ -235,8 +235,8 @@ public class Graph {
     }
 
     /**
-     * Removes all vertices and connections that are within range to be removed using the
-     * position of the mouse.
+     * Removes all vertices and connections that are within range to be removed using the position
+     * of the mouse.
      *
      * @param position the position of the mouse
      */
