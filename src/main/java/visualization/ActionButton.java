@@ -34,6 +34,9 @@ public class ActionButton extends Button {
             case LOAD:
                 FileOperations.loadFile();
                 break;
+            case RESET:
+                Drawer.reset();
+                break;
         }
     }
 }

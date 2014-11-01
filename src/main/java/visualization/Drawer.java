@@ -127,6 +127,11 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         final ActionButton loadButton = new ActionButton(loadButtonPosition, 100, 50, "Load",
                 Action.LOAD);
         buttons.add(loadButton);
+        final ScreenPosition resetButtonPosition = new ScreenPosition(200,
+                frame.getHeight() - top - 50);
+        final ActionButton resetButton = new ActionButton(resetButtonPosition, 100, 50, "Reset",
+                Action.RESET);
+        buttons.add(resetButton);
     }
 
     public void paintComponent(Graphics g) {
