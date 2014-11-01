@@ -141,6 +141,10 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                     mouseY);
         }
 
+        if(mode == MouseMode.VERTEX) {
+            Vertex.drawGhost(g, mouseX, mouseY);
+        }
+
         if (graph != null) {
             graph.drawGraph(g, canvasX, canvasY);
             g.setColor(frame.getBackground());
@@ -199,6 +203,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     }
 
     public void mouseMoved(MouseEvent e) {
+        updateMousePosition(e);
+
         // Update the buttons to reflect whether the mouse is over them
         for (Button button : buttons) {
             // If the button is not already selected and the mouse is over it put it in the hover

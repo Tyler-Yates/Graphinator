@@ -167,6 +167,20 @@ public class Vertex {
     }
 
     /**
+     * Draws a ghost vertex to the given canvas at the given position
+     *
+     * @param g the canvas
+     * @param x the x position to draw the vertex
+     * @param y the y position to draw the vertex
+     */
+    public static void drawGhost(Graphics g, int x, int y) {
+        g.setColor(new Color(128, 128, 128, 128));
+        g.fillOval(x - radius, y - radius, diameter, diameter);
+        g.setColor(new Color(255, 255, 255, 128));
+        g.drawOval(x - radius, y - radius, diameter, diameter);
+    }
+
+    /**
      * Returns the degree of the vertex.
      *
      * @return the degree of the vertex
