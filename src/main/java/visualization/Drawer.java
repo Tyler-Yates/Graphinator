@@ -4,18 +4,23 @@ import graph.CanvasPosition;
 import graph.Graph;
 import graph.Vertex;
 import util.Action;
+import util.FileOperations;
+import util.MalformedGraphException;
 import util.MouseMode;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.io.IOException;
 import java.util.ArrayList;
 
-public class Drawer extends JPanel implements MouseMotionListener, MouseListener {
+public class Drawer extends JPanel implements MouseMotionListener, MouseListener, KeyListener {
     private static final long serialVersionUID = 5174812665272092921L;
 
     private static final double VERSION = 0.1;
@@ -48,6 +53,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         frame.setBackground(Color.black);
         frame.addMouseMotionListener(this);
         frame.addMouseListener(this);
+        frame.addKeyListener(this);
         // Reposition the buttons when resizing the window
         frame.addComponentListener(new ComponentAdapter() {
             @Override
@@ -146,7 +152,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                     mouseY);
         }
 
-        if(mode == MouseMode.VERTEX) {
+        if (mode == MouseMode.VERTEX) {
             Vertex.drawGhost(g, mouseX, mouseY);
         }
 
@@ -259,13 +265,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                 if (button.contains(getScreenPosition(e))) {
                     // Only ModeButtons should be selected
                     if (button instanceof ModeButton) {
-                        // Deselect the currently selected button if there is one
-                        if (selectedButton != null) {
-                            selectedButton.setButtonState(ButtonState.NORMAL);
-                        }
-                        // Set the new button as selected
-                        button.setButtonState(ButtonState.SELECTED);
-                        selectedButton = button;
+                        selectButton(button);
                     }
 
                     // Perform the button action if it has one
@@ -423,13 +423,82 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
      * Resets the graph by removing all vertices and connections.
      */
     public static void reset() {
-        graph = new Graph();
-        infoNode = null;
-        selectedVertex = null;
+        final int response = JOptionPane.showConfirmDialog(null, "Do you want to reset the " +
+                "graph?" + " This action is not undoable.", "Confirm Reset",
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
-        canvasX = 0;
-        canvasY = 0;
-        dragged = false;
-        draggingCanvas = false;
+        if (response == JOptionPane.YES_OPTION) {
+            graph = new Graph();
+            infoNode = null;
+            selectedVertex = null;
+
+            canvasX = 0;
+            canvasY = 0;
+            dragged = false;
+            draggingCanvas = false;
+        }
+    }
+
+    private void selectButton(Button button) {
+        // Deselect the currently selected button if there is one
+        if (selectedButton != null) {
+            selectedButton.setButtonState(ButtonState.NORMAL);
+        }
+        // Set the new button as selected
+        button.setButtonState(ButtonState.SELECTED);
+        selectedButton = button;
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        try {
+            switch (e.getKeyCode()) {
+                case KeyEvent.VK_S:
+                    FileOperations.saveFile();
+                    break;
+                case KeyEvent.VK_L:
+                    FileOperations.loadFile();
+                    break;
+                case KeyEvent.VK_N:
+                    reset();
+                    break;
+                case KeyEvent.VK_C:
+                    mode = MouseMode.CONNECTION;
+                    selectButton(getButton(mode));
+                    break;
+                case KeyEvent.VK_V:
+                    mode = MouseMode.VERTEX;
+                    selectButton(getButton(mode));
+                    break;
+                case KeyEvent.VK_R:
+                    mode = MouseMode.REMOVE;
+                    selectButton(getButton(mode));
+                    break;
+            }
+        } catch (IOException | MalformedGraphException e1) {
+            e1.printStackTrace();
+        } finally {
+            repaint();
+        }
+    }
+
+    private Button getButton(MouseMode mode) {
+        for (Button button : buttons) {
+            if (button instanceof ModeButton && ((ModeButton) button).getMode() == mode) {
+                return button;
+            }
+        }
+
+        return null;
     }
 }
