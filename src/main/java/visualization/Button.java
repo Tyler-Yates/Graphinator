@@ -82,6 +82,9 @@ public abstract class Button {
 
         if (buttonState == ButtonState.SELECTED) {
             g.setColor(Color.red);
+            g.drawRect(x + 1, y + 1, width - 2, height - 2);
+        } else {
+            g.setColor(Color.DARK_GRAY);
             g.drawRect(x, y, width, height);
         }
 
@@ -103,6 +106,8 @@ public abstract class Button {
 
     /**
      * Performs the action associated with the current button.
+     *
+     * @throws Exception if an error was encountered while performing the action
      */
     public abstract void perform() throws Exception;
 
