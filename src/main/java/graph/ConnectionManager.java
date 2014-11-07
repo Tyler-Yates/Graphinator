@@ -113,7 +113,8 @@ class ConnectionManager {
 
     /**
      * Returns the neighbors of the given vertex. If the vertex has no neighbors an empty set will
-     * be returned.
+     * be returned. The neighbors of a vertex are all the vertices that are endpoints of
+     * connections originating from the vertex.
      *
      * @param start the starting vertex
      *

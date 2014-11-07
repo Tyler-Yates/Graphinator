@@ -115,7 +115,8 @@ public class Vertex {
     }
 
     /**
-     * Returns the neighbors of the current vertex.
+     * Returns the neighbors of the current vertex. The neighbors of a vertex are all the
+     * vertices that are endpoints of connections originating from the vertex.
      *
      * @return the neighbors
      */
