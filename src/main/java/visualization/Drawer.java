@@ -8,8 +8,13 @@ import util.FileOperations;
 import util.MalformedGraphException;
 import util.MouseMode;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.WindowConstants;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
@@ -64,6 +69,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             }
         });
         frame.add(this);
+
+        CursorManager.setCursor(frame, MouseMode.VERTEX);
     }
 
     public static void main(String args[]) {
@@ -123,18 +130,18 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                 100, 50, "Remove");
         buttons.add(removeButton);
 
-        final ScreenPosition saveButtonPosition = new ScreenPosition(0,
-                frame.getHeight() - top - 50);
+        final ScreenPosition saveButtonPosition = new ScreenPosition(0, frame.getHeight() - top -
+                50);
         final ActionButton saveButton = new ActionButton(saveButtonPosition, 100, 50, "Save",
                 Action.SAVE);
         buttons.add(saveButton);
-        final ScreenPosition loadButtonPosition = new ScreenPosition(100,
-                frame.getHeight() - top - 50);
+        final ScreenPosition loadButtonPosition = new ScreenPosition(100, frame.getHeight() - top
+                - 50);
         final ActionButton loadButton = new ActionButton(loadButtonPosition, 100, 50, "Load",
                 Action.LOAD);
         buttons.add(loadButton);
-        final ScreenPosition resetButtonPosition = new ScreenPosition(200,
-                frame.getHeight() - top - 50);
+        final ScreenPosition resetButtonPosition = new ScreenPosition(200, frame.getHeight() -
+                top - 50);
         final ActionButton resetButton = new ActionButton(resetButtonPosition, 100, 50, "Reset",
                 Action.RESET);
         buttons.add(resetButton);
@@ -265,7 +272,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                 if (button.contains(getScreenPosition(e))) {
                     // Only ModeButtons should be selected
                     if (button instanceof ModeButton) {
-                        selectButton(button);
+                        changeMouseMode(((ModeButton) button).getMode());
                     }
 
                     // Perform the button action if it has one
@@ -424,8 +431,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
      */
     public static void reset() {
         final int response = JOptionPane.showConfirmDialog(null, "Do you want to reset the " +
-                "graph?" + " This action is not undoable.", "Confirm Reset",
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                "graph?" + " This action is not undoable.", "Confirm Reset", JOptionPane
+                .YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
         if (response == JOptionPane.YES_OPTION) {
             graph = new Graph();
@@ -437,16 +444,6 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             dragged = false;
             draggingCanvas = false;
         }
-    }
-
-    private void selectButton(Button button) {
-        // Deselect the currently selected button if there is one
-        if (selectedButton != null) {
-            selectedButton.setButtonState(ButtonState.NORMAL);
-        }
-        // Set the new button as selected
-        button.setButtonState(ButtonState.SELECTED);
-        selectedButton = button;
     }
 
     @Override
@@ -473,16 +470,13 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                     reset();
                     break;
                 case KeyEvent.VK_C:
-                    mode = MouseMode.CONNECTION;
-                    selectButton(getButton(mode));
+                    changeMouseMode(MouseMode.CONNECTION);
                     break;
                 case KeyEvent.VK_V:
-                    mode = MouseMode.VERTEX;
-                    selectButton(getButton(mode));
+                    changeMouseMode(MouseMode.VERTEX);
                     break;
                 case KeyEvent.VK_R:
-                    mode = MouseMode.REMOVE;
-                    selectButton(getButton(mode));
+                    changeMouseMode(MouseMode.REMOVE);
                     break;
             }
         } catch (IOException | MalformedGraphException e1) {
@@ -490,6 +484,22 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         } finally {
             repaint();
         }
+    }
+
+    private void changeMouseMode(MouseMode newMouseMode) {
+        mode = newMouseMode;
+        selectButton(getButton(mode));
+        CursorManager.setCursor(frame, newMouseMode);
+    }
+
+    private void selectButton(Button button) {
+        // Deselect the currently selected button if there is one
+        if (selectedButton != null) {
+            selectedButton.setButtonState(ButtonState.NORMAL);
+        }
+        // Set the new button as selected
+        button.setButtonState(ButtonState.SELECTED);
+        selectedButton = button;
     }
 
     private Button getButton(MouseMode mode) {
