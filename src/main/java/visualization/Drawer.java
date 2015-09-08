@@ -160,7 +160,23 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         }
 
         if (mode == MouseMode.VERTEX) {
-            Vertex.drawGhost(g, mouseX, mouseY);
+            boolean drawGhost = true;
+            for (Button button : buttons) {
+                if (button.contains(new ScreenPosition(mouseX, mouseY))) {
+                    drawGhost = false;
+                    break;
+                }
+            }
+            for (Vertex vertex : graph.getVertices()) {
+                if (vertex.pointInVertex(getCanvasPosition(mouseX, mouseY))) {
+                    drawGhost = false;
+                    break;
+                }
+            }
+
+            if (drawGhost) {
+                Vertex.drawGhost(g, mouseX, mouseY);
+            }
         }
 
         if (graph != null) {
@@ -393,6 +409,10 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         final int y = screenPosition.getY() - canvasY;
 
         return new CanvasPosition(x, y);
+    }
+
+    private CanvasPosition getCanvasPosition(int x, int y) {
+        return new CanvasPosition(x - canvasX, y - canvasY);
     }
 
     /**
