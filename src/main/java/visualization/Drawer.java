@@ -113,8 +113,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
         final ScreenPosition vertexButtonPosition = new ScreenPosition(frame.getWidth() - left -
                 200, frame.getHeight() - top - 50);
-        final ModeButton vertexButton = new ModeButton(MouseMode.VERTEX, vertexButtonPosition,
-                100, 50, "Vertex");
+        final ModeButton vertexButton = new ModeButton(MouseMode.VERTEX, vertexButtonPosition, 100,
+                50, "Vertex");
         buttons.add(vertexButton);
         //The vertex button starts out as the selected button
         selectedButton = vertexButton;
@@ -126,8 +126,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         buttons.add(connectionButton);
         final ScreenPosition removeButtonPosition = new ScreenPosition(frame.getWidth() - left -
                 300, frame.getHeight() - top - 50);
-        final ModeButton removeButton = new ModeButton(MouseMode.REMOVE, removeButtonPosition,
-                100, 50, "Remove");
+        final ModeButton removeButton = new ModeButton(MouseMode.REMOVE, removeButtonPosition, 100,
+                50, "Remove");
         buttons.add(removeButton);
 
         final ScreenPosition saveButtonPosition = new ScreenPosition(0, frame.getHeight() - top -
@@ -135,8 +135,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         final ActionButton saveButton = new ActionButton(saveButtonPosition, 100, 50, "Save",
                 Action.SAVE);
         buttons.add(saveButton);
-        final ScreenPosition loadButtonPosition = new ScreenPosition(100, frame.getHeight() - top
-                - 50);
+        final ScreenPosition loadButtonPosition = new ScreenPosition(100,
+                frame.getHeight() - top - 50);
         final ActionButton loadButton = new ActionButton(loadButtonPosition, 100, 50, "Load",
                 Action.LOAD);
         buttons.add(loadButton);
@@ -204,7 +204,9 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             b.draw(g);
         }
 
-        infoPanel.draw(g);
+        if (selectedVertex == null) {
+            infoPanel.draw(g);
+        }
     }
 
     public void mouseDragged(MouseEvent e) {
@@ -249,8 +251,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         for (Button button : buttons) {
             // If the button is not already selected and the mouse is over it put it in the hover
             // state
-            if (button.getButtonState() != ButtonState.SELECTED && button.contains
-                    (getScreenPosition(e))) {
+            if (button.getButtonState() != ButtonState.SELECTED && button.contains(
+                    getScreenPosition(e))) {
                 button.setButtonState(ButtonState.HOVER);
             } else if (button.getButtonState() == ButtonState.HOVER) {
                 button.setButtonState(ButtonState.NORMAL);
@@ -397,6 +399,17 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             draggingCanvas = false;
         }
 
+        // TODO Don't go through every node but instead set it above
+        // Update the vertex to draw the info panel for
+        infoNode = null;
+        for (Vertex vertex : graph.getVertices()) {
+            if (vertex.pointInVertex(getCanvasPosition(e))) {
+                infoNode = vertex;
+                infoPanel.setPosition(getScreenPosition(e));
+                break;
+            }
+        }
+
         repaint();
     }
 
@@ -456,9 +469,9 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
      * Resets the graph by removing all vertices and connections.
      */
     public static void reset() {
-        final int response = JOptionPane.showConfirmDialog(null, "Do you want to reset the " +
-                "graph?" + " This action is not undoable.", "Confirm Reset", JOptionPane
-                .YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        final int response = JOptionPane.showConfirmDialog(null,
+                "Do you want to reset the graph? This action is not undoable.", "Confirm Reset",
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
         if (response == JOptionPane.YES_OPTION) {
             graph = new Graph();
