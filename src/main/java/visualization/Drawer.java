@@ -198,14 +198,15 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             g.drawString("Tree: " + graph.properties().isTree(), 10, 140);
             g.drawString("Regular: " + graph.properties().isRegular(), 10, 160);
             g.drawString("Complete: " + graph.properties().isComplete(), 10, 180);
-        }
 
-        for (Button b : buttons) {
-            b.draw(g);
-        }
+            for (Button b : buttons) {
+                b.draw(g);
+            }
 
-        if (selectedVertex == null) {
-            infoPanel.draw(g);
+            if (selectedVertex == null && infoNode != null) {
+                calculateBestInfoPanelPosition();
+                infoPanel.draw(g);
+            }
         }
     }
 
@@ -236,7 +237,6 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         // If we are in vertex mode update the position of the selected vertex
         if (mode == MouseMode.VERTEX) {
             if (selectedVertex != null) {
-                infoPanel.setPosition(getScreenPosition(e));
                 selectedVertex.setPosition(getCanvasPosition(e));
             }
         }
@@ -269,7 +269,6 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         for (Vertex vertex : graph.getVertices()) {
             if (vertex.pointInVertex(getCanvasPosition(e))) {
                 infoNode = vertex;
-                infoPanel.setPosition(getScreenPosition(e));
                 break;
             }
         }
@@ -405,12 +404,40 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         for (Vertex vertex : graph.getVertices()) {
             if (vertex.pointInVertex(getCanvasPosition(e))) {
                 infoNode = vertex;
-                infoPanel.setPosition(getScreenPosition(e));
                 break;
             }
         }
 
         repaint();
+    }
+
+    private void calculateBestInfoPanelPosition() {
+        if (infoNode != null) {
+            infoPanel.setVertex(infoNode);
+
+            int fewestConflicts = Integer.MAX_VALUE;
+            Diagonal bestDiagonal = Diagonal.LOWER_RIGHT;
+            for (final Diagonal diagonal : Diagonal.values()) {
+                final RectangleOnScreen rectangle = infoPanel.getRectangle(diagonal);
+                final int conflicts = calculateConflicts(rectangle);
+                if (conflicts < fewestConflicts) {
+                    bestDiagonal = diagonal;
+                    fewestConflicts = conflicts;
+                }
+            }
+
+            infoPanel.setDrawDirection(bestDiagonal);
+        }
+    }
+
+    private int calculateConflicts(RectangleOnScreen rectangle) {
+        int conflicts = 0;
+        for (final Vertex vertex : graph.getVertices()) {
+            if (rectangle.containsVertex(vertex, canvasX, canvasY)) {
+                conflicts++;
+            }
+        }
+        return conflicts;
     }
 
     /**

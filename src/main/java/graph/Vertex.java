@@ -57,6 +57,15 @@ public class Vertex {
     }
 
     /**
+     * Returns the radius of the vertex.
+     *
+     * @return the radius
+     */
+    public int getRadius() {
+        return radius;
+    }
+
+    /**
      * Selects the given vertex
      */
     public void select() {
