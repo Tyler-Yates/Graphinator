@@ -2,7 +2,12 @@ package graph;
 
 import visualization.Drawer;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.geom.Rectangle2D;
 import java.util.Set;
 
 /**
@@ -165,6 +170,26 @@ public class Vertex {
             g.setColor(Color.white);
         }
         g.drawOval(x - radius + cX, y - radius + cY, diameter, diameter);
+
+        // Draw the ID
+        g.setColor(getContrastColor(graph.getColorManager().getColor(color)));
+        g.setFont(new Font("Arial", Font.PLAIN, 10));
+        drawStringCentered(g, Integer.toString(id), x - radius + cX, y - radius + cY, radius * 2,
+                radius * 2);
+    }
+
+    private static Color getContrastColor(Color color) {
+        double y = (299 * color.getRed() + 587 * color.getGreen() + 114 * color.getBlue()) / 1000;
+        return y >= 128 ? Color.black : Color.white;
+    }
+
+    private static void drawStringCentered(Graphics g, String s, int x, int y, int width,
+            int height) {
+        final Rectangle2D bds1 = g.getFont().createGlyphVector(
+                ((Graphics2D) g).getFontRenderContext(), s).getVisualBounds();
+        final int w = (int) bds1.getWidth();
+        final int h = (int) bds1.getHeight();
+        g.drawString(s, x + (width / 2 - w / 2), y + (height / 2 + h / 2));
     }
 
     /**
