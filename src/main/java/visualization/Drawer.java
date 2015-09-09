@@ -181,8 +181,12 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
         if (graph != null) {
             graph.drawGraph(g, canvasX, canvasY);
+            g.setFont(new Font("Arial", Font.PLAIN, 12));
             g.setColor(frame.getBackground());
             g.fillRect(0, 0, 200, 150);
+            g.setColor(Color.LIGHT_GRAY);
+            g.drawLine(0, 150, 200, 150);
+            g.drawLine(200, 0, 200, 150);
             g.setColor(Color.white);
             g.drawString("Number of Vertices: " + graph.numberOfVertices(), 10, 20);
             //TODO For directed graphs don't divide by two
