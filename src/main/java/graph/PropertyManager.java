@@ -20,6 +20,7 @@ public class PropertyManager {
     private boolean tree = false;
     private boolean connected = true;
     private boolean regular;
+    private int girth = 0;
     private final Set<Cycle> cycles = new HashSet<>();
 
     /**
@@ -136,8 +137,19 @@ public class PropertyManager {
         return cycles.size();
     }
 
+    /**
+     * Returns the girth of the graph.
+     *
+     * @return the girth of the graph
+     */
+    public int getGirth() {
+        return girth;
+    }
+
     public void calculateCycles() {
         cycles.clear();
+        girth = 0;
+
         for (final Vertex startingVertex : graph.getVertices()) {
             calculateCycle(startingVertex, new CycleBuilder());
         }
@@ -147,7 +159,12 @@ public class PropertyManager {
     private void calculateCycle(Vertex currentVertex, CycleBuilder cycleBuilder) {
         if (cycleBuilder.addVertex(currentVertex)) {
             if (cycleBuilder.isCycle()) {
-                cycles.add(cycleBuilder.build());
+                final Cycle cycle = cycleBuilder.build();
+                if (cycles.add(cycle)) {
+                    if (girth == 0 || cycle.length() < girth) {
+                        girth = cycle.length();
+                    }
+                }
             } else {
                 for (final Vertex neighbor : currentVertex.getNeighbors()) {
                     calculateCycle(neighbor, cycleBuilder);

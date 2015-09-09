@@ -42,6 +42,15 @@ public class Cycle {
         return vertices;
     }
 
+    /**
+     * Returns the length of the cycle.
+     *
+     * @return the length of the cycle
+     */
+    public int length() {
+        return vertices.size() - 1;
+    }
+
     @Override
     public boolean equals(Object other) {
         return other instanceof Cycle && ((Cycle) other).vertexSet.equals(vertexSet);
