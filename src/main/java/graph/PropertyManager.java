@@ -113,6 +113,15 @@ public class PropertyManager {
         return regular;
     }
 
+    /**
+     * Returns whether the graph is complete.
+     *
+     * @return whether the graph is complete
+     */
+    public boolean isComplete() {
+        return maxDegree == graph.numberOfVertices() - 1 && isRegular();
+    }
+
     /*private void cycleExists(Vertex original, Vertex parent, Vertex v, ArrayList<Vertex>
     visited) {
         if (tempCycle) {
