@@ -6,6 +6,8 @@ Graphinator is an easy-to-use visual learning tool for graphs. Users are able to
  - What is the maximum [degree](http://en.wikipedia.org/wiki/Degree_(graph_theory)) of the graph?
  - Is the graph [bipartite](http://en.wikipedia.org/wiki/Bipartite_graph)?
  - Is the graph a [tree](http://en.wikipedia.org/wiki/Tree_(graph_theory))?
+ - Is the graph a [regular graph](https://en.wikipedia.org/wiki/Regular_graph)?
+ - Is the graph a [complete graph](https://en.wikipedia.org/wiki/Complete_graph)?
 
 Graphinator allows users to add, move, and delete both vertices and connections in real-time with all relevant graph information updated instantaneously. Users are able to save the graphs they create to disk allowing graphs to be shared between teachers and students.
 <br>
