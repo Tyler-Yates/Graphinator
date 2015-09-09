@@ -1,11 +1,17 @@
 package graph;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Used to detect and report the properties of a graph.
  */
 public class PropertyManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PropertyManager.class);
 
     private final Graph graph;
 
@@ -14,8 +20,7 @@ public class PropertyManager {
     private boolean tree = false;
     private boolean connected = true;
     private boolean regular;
-
-    //static boolean tempCycle = false;
+    private final Set<Cycle> cycles = new HashSet<>();
 
     /**
      * Constructs a property manager for the given graph.
@@ -91,7 +96,7 @@ public class PropertyManager {
     }
 
     private void calculateRegularity() {
-        if(graph.numberOfVertices() > 0) {
+        if (graph.numberOfVertices() > 0) {
             final Iterator<Vertex> iterator = graph.getVertices().iterator();
             final int degree = iterator.next().getDegree();
             while (iterator.hasNext()) {
@@ -122,73 +127,41 @@ public class PropertyManager {
         return maxDegree == graph.numberOfVertices() - 1 && isRegular();
     }
 
-    /*private void cycleExists(Vertex original, Vertex parent, Vertex v, ArrayList<Vertex>
-    visited) {
-        if (tempCycle) {
-            return;
-        }
-        if (v == null) {
-            for (Vertex temp : original.getNeighbors()) {
-                cycleExists(original, original, temp, visited);
-            }
-        } else if (v.equals(original)) {
-            tempCycle = true;
-            return;
-        } else if (visited.contains(v)) {
-            return;
-        } else {
-            visited.add(v);
-            for (Vertex temp : v.getNeighbors()) {
-                if (!temp.equals(parent)) {
-                    cycleExists(original, v, temp, visited);
-                }
-            }
-        }
+    /**
+     * Returns the number of cycles in the graph.
+     *
+     * @return the number of cycles in the graph
+     */
+    public int numCycles() {
+        return cycles.size();
     }
 
-    public ArrayList<Circuit> findCircuits(Vertex v) {
-        if (v == null) {
-            return null;
+    public void calculateCycles() {
+        cycles.clear();
+        for (final Vertex startingVertex : graph.getVertices()) {
+            calculateCycle(startingVertex, new CycleBuilder());
         }
-        ArrayList<Circuit> circuits = new ArrayList<Circuit>();
-
-
-        for (Vertex temp : v.getNeighbors()) {
-            ArrayList<Connection> connections = new ArrayList<>();
-            connections.add(new Connection(v, temp));
-            Circuit c = new Circuit();
-            c.addVertex(v);
-            findCircuitsHelper(temp, v, c, connections, circuits);
-        }
-        return circuits;
+        LOGGER.info("Cycles: " + cycles.toString());
     }
 
-    private void findCircuitsHelper(Vertex current, Vertex original, Circuit currentPath,
-            ArrayList<Connection> connections, ArrayList<Circuit> ans) {
-        //System.out.println(current+" "+connections);
-        currentPath.addVertex(current);
-        outer:
-        for (Vertex v : current.getNeighbors()) {
-            Connection newConnect = new Connection(current, v);
-            for (Connection e : connections) {
-                if (e.equals(newConnect)) {
-                    continue outer;
-                }
-            }
-            if (v.equals(original)) {
-                ans.add(currentPath.clone());
+    private void calculateCycle(Vertex currentVertex, CycleBuilder cycleBuilder) {
+        if (cycleBuilder.addVertex(currentVertex)) {
+            if (cycleBuilder.isCycle()) {
+                cycles.add(cycleBuilder.build());
             } else {
-                connections.add(newConnect);
-                currentPath.addVertex(v);
-                findCircuitsHelper(v, original, currentPath, connections, ans);
+                for (final Vertex neighbor : currentVertex.getNeighbors()) {
+                    calculateCycle(neighbor, cycleBuilder);
+                }
             }
+            cycleBuilder.removeVertex();
         }
-    }*/
+    }
 
     void calculateProperties() {
         calculateMaxDegree();
         calculateTree();
         calculateBipartite();
         calculateRegularity();
+        calculateCycles();
     }
 }

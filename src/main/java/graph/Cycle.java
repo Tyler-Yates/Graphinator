@@ -25,6 +25,15 @@ public class Cycle {
     }
 
     /**
+     * Returns the first vertex in the cycle.
+     *
+     * @return the first vertex in the cycle
+     */
+    public Vertex getFirstVertex() {
+        return vertices.get(0);
+    }
+
+    /**
      * Returns an immutable view of the vertices in this cycle.
      *
      * @return the vertices in the cycle
@@ -40,6 +49,11 @@ public class Cycle {
 
     @Override
     public int hashCode() {
-        return vertices.hashCode();
+        return vertexSet.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return vertices.toString();
     }
 }

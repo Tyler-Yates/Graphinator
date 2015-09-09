@@ -183,10 +183,10 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             graph.drawGraph(g, canvasX, canvasY);
             g.setFont(new Font("Arial", Font.PLAIN, 12));
             g.setColor(frame.getBackground());
-            g.fillRect(0, 0, 200, 190);
+            g.fillRect(0, 0, 200, 210);
             g.setColor(Color.LIGHT_GRAY);
-            g.drawLine(0, 190, 200, 190);
-            g.drawLine(200, 0, 200, 190);
+            g.drawLine(0, 210, 200, 210);
+            g.drawLine(200, 0, 200, 210);
             g.setColor(Color.white);
             g.drawString("Number of Vertices: " + graph.numberOfVertices(), 10, 20);
             //TODO For directed graphs don't divide by two
@@ -198,6 +198,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             g.drawString("Tree: " + graph.properties().isTree(), 10, 140);
             g.drawString("Regular: " + graph.properties().isRegular(), 10, 160);
             g.drawString("Complete: " + graph.properties().isComplete(), 10, 180);
+            g.drawString("Number of Cycles: " + graph.properties().numCycles(), 10, 200);
 
             for (Button b : buttons) {
                 b.draw(g);
