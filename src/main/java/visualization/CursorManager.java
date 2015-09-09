@@ -24,7 +24,7 @@ public class CursorManager {
 
         cursorImages.put(MouseMode.VERTEX, cursorImageFolder + "vertex.png");
         cursorImages.put(MouseMode.CONNECTION, cursorImageFolder + "connection.png");
-        cursorImages.put(MouseMode.REMOVE, cursorImageFolder + "remove2.png");
+        cursorImages.put(MouseMode.REMOVE, cursorImageFolder + "remove.png");
     }
 
     /**
