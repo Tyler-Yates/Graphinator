@@ -1,5 +1,7 @@
 package graph;
 
+import java.util.Iterator;
+
 /**
  * Used to detect and report the properties of a graph.
  */
@@ -11,6 +13,7 @@ public class PropertyManager {
     private boolean bipartite = false;
     private boolean tree = false;
     private boolean connected = true;
+    private boolean regular;
 
     //static boolean tempCycle = false;
 
@@ -87,7 +90,31 @@ public class PropertyManager {
         return tree;
     }
 
-    /*private void cycleExists(Vertex original, Vertex parent, Vertex v, ArrayList<Vertex> visited) {
+    private void calculateRegularity() {
+        if(graph.numberOfVertices() > 0) {
+            final Iterator<Vertex> iterator = graph.getVertices().iterator();
+            final int degree = iterator.next().getDegree();
+            while (iterator.hasNext()) {
+                if (iterator.next().getDegree() != degree) {
+                    regular = false;
+                    return;
+                }
+            }
+        }
+        regular = true;
+    }
+
+    /**
+     * Returns whether the graph is regular.
+     *
+     * @return whether the graph is regular
+     */
+    public boolean isRegular() {
+        return regular;
+    }
+
+    /*private void cycleExists(Vertex original, Vertex parent, Vertex v, ArrayList<Vertex>
+    visited) {
         if (tempCycle) {
             return;
         }
@@ -153,5 +180,6 @@ public class PropertyManager {
         calculateMaxDegree();
         calculateTree();
         calculateBipartite();
+        calculateRegularity();
     }
 }
