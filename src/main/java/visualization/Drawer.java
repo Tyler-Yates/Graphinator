@@ -217,7 +217,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
             if (selectedVertex == null && infoNode != null) {
                 calculateBestInfoPanelPosition();
-                infoPanel.draw(g);
+                infoPanel.draw(g, canvasX, canvasY);
             }
         }
     }
@@ -430,7 +430,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             int fewestConflicts = Integer.MAX_VALUE;
             Diagonal bestDiagonal = Diagonal.LOWER_RIGHT;
             for (final Diagonal diagonal : Diagonal.values()) {
-                final RectangleOnScreen rectangle = infoPanel.getRectangle(diagonal);
+                final RectangleOnScreen rectangle = infoPanel.getRectangle(diagonal, canvasX,
+                        canvasY);
                 final int conflicts = calculateConflicts(rectangle);
                 if (conflicts < fewestConflicts) {
                     bestDiagonal = diagonal;

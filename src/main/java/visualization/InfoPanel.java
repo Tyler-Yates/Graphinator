@@ -39,8 +39,10 @@ public class InfoPanel {
      * Draws the current info panel to the given canvas.
      *
      * @param g the canvas
+     * @param canvasX the x canvas shift
+     * @param canvasY the y canvas shift
      */
-    public void draw(Graphics g) {
+    public void draw(Graphics g, int canvasX, int canvasY) {
         g.setFont(new Font("Arial", Font.PLAIN, 12));
 
         // Don't draw if we don't have a node to get information from
@@ -51,7 +53,7 @@ public class InfoPanel {
 
         g.setColor(backgroundColor);
 
-        final RectangleOnScreen rectangle = getRectangle(drawDirection);
+        final RectangleOnScreen rectangle = getRectangle(drawDirection, canvasX, canvasY);
 
         final int upperLeftX = rectangle.getX();
         final int upperLeftY = rectangle.getY();
@@ -67,32 +69,38 @@ public class InfoPanel {
      * direction.
      *
      * @param drawDirection the given draw direction
+     * @param canvasX the x canvas shift
+     * @param canvasY the y canvas shift
      *
      * @return the rectangle
      */
-    public RectangleOnScreen getRectangle(Diagonal drawDirection) {
+    public RectangleOnScreen getRectangle(Diagonal drawDirection, int canvasX, int canvasY) {
+        final ScreenPosition vertexScreenPosition = vertex.getScreenPosition(canvasX, canvasY);
+        final int x = vertexScreenPosition.getX();
+        final int y = vertexScreenPosition.getY();
+
         int upperLeftX;
         int upperLeftY;
         switch (drawDirection) {
             case UPPER_LEFT:
-                upperLeftX = vertex.getX() - width;
-                upperLeftY = vertex.getY() - height;
+                upperLeftX = x - width;
+                upperLeftY = y - height;
                 break;
             case UPPER_RIGHT:
-                upperLeftX = vertex.getX();
-                upperLeftY = vertex.getY() - height;
+                upperLeftX = x;
+                upperLeftY = y - height;
                 break;
             case LOWER_LEFT:
-                upperLeftX = vertex.getX() - width;
-                upperLeftY = vertex.getY();
+                upperLeftX = x - width;
+                upperLeftY = y;
                 break;
             case LOWER_RIGHT:
-                upperLeftX = vertex.getX();
-                upperLeftY = vertex.getY();
+                upperLeftX = x;
+                upperLeftY = y;
                 break;
             default:
-                upperLeftX = vertex.getX();
-                upperLeftY = vertex.getY();
+                upperLeftX = x;
+                upperLeftY = y;
         }
 
         upperLeftX += Diagonal.getX(drawDirection, vertex.getRadius());

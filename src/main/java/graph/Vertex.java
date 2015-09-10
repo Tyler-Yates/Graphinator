@@ -1,6 +1,7 @@
 package graph;
 
 import visualization.Drawer;
+import visualization.ScreenPosition;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -96,6 +97,18 @@ public class Vertex {
     public void setPosition(CanvasPosition position) {
         x = position.getX();
         y = position.getY();
+    }
+
+    /**
+     * Returns the position of the current vertex on-screen accounting for the given canvas shift.
+     *
+     * @param canvasX the x canvas shift
+     * @param canvasY the y canvas shift
+     *
+     * @return the on-screen position of the vertex
+     */
+    public ScreenPosition getScreenPosition(int canvasX, int canvasY) {
+        return new ScreenPosition(x + canvasX, y + canvasY);
     }
 
     /**

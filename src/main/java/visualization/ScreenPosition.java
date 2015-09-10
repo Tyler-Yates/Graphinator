@@ -8,7 +8,7 @@ import util.Position;
  */
 public class ScreenPosition extends Position {
 
-    protected ScreenPosition(int x, int y) {
+    public ScreenPosition(int x, int y) {
         super(x, y);
     }
 }
