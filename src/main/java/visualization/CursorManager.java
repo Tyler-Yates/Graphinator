@@ -40,8 +40,7 @@ public class CursorManager {
         // Only set the cursor to the custom image if it exists
         if (filePath != null && new File(filePath).exists()) {
             final Image image = toolkit.getImage(filePath);
-            final Cursor c = toolkit.createCustomCursor(image, new Point(frame.getX(), frame.getY
-                    ()), "img");
+            final Cursor c = toolkit.createCustomCursor(image, new Point(0, 0), "img");
             frame.setCursor(c);
         } else {
             // Otherwise just set it to the default cursor
