@@ -2,6 +2,7 @@ package visualization;
 
 import graph.Vertex;
 
+import java.awt.Frame;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -54,5 +55,35 @@ public class RectangleOnScreen {
      */
     public int getY() {
         return (int) rectangle.getY();
+    }
+
+    /**
+     * Returns the largest on-screen x value.
+     *
+     * @return the largest on-screen x value
+     */
+    public int getMaxX() {
+        return (int) rectangle.getMaxX();
+    }
+
+    /**
+     * Returns the largest on-screen y value.
+     *
+     * @return the largest on-screen y value
+     */
+    public int getMaxY() {
+        return (int) rectangle.getMaxY();
+    }
+
+    /**
+     * Returns whether a part of the rectangle would be rendered outside of the viewing window.
+     *
+     * @param frame the viewing window
+     *
+     * @return whether a part of the rectangle would be rendered outside of the viewing window
+     */
+    public boolean isOffScreen(Frame frame) {
+        return getX() < 0 || getY() < 0 || getMaxX() > frame.getWidth() || getY() > frame
+                .getHeight();
     }
 }

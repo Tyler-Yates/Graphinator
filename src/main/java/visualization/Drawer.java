@@ -450,6 +450,9 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                 conflicts++;
             }
         }
+        if (rectangle.isOffScreen(frame)) {
+            conflicts = Integer.MAX_VALUE;
+        }
         return conflicts;
     }
 
