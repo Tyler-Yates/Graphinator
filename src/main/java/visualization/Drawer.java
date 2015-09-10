@@ -106,45 +106,51 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     }
 
     public static void initButtons() {
-        buttons.clear();
-        // Get the dimensions of the window border to calculate accurate coordinates on the screen
-        final int left = frame.getInsets().left;
-        final int top = frame.getInsets().top;
+        synchronized (buttons) {
+            buttons.clear();
+            // Get the dimensions of the window border to calculate accurate coordinates on the
+            // screen
 
-        final ScreenPosition vertexButtonPosition = new ScreenPosition(frame.getWidth() - left -
-                200, frame.getHeight() - top - 50);
-        final ModeButton vertexButton = new ModeButton(MouseMode.VERTEX, vertexButtonPosition, 100,
-                50, "Vertex");
-        buttons.add(vertexButton);
-        //The vertex button starts out as the selected button
-        selectedButton = vertexButton;
-        vertexButton.setButtonState(ButtonState.SELECTED);
-        final ScreenPosition connectionButtonPosition = new ScreenPosition(frame.getWidth() - left -
-                100, frame.getHeight() - top - 50);
-        final ModeButton connectionButton = new ModeButton(MouseMode.CONNECTION,
-                connectionButtonPosition, 100, 50, "Connection");
-        buttons.add(connectionButton);
-        final ScreenPosition removeButtonPosition = new ScreenPosition(frame.getWidth() - left -
-                300, frame.getHeight() - top - 50);
-        final ModeButton removeButton = new ModeButton(MouseMode.REMOVE, removeButtonPosition, 100,
-                50, "Remove");
-        buttons.add(removeButton);
+            final int left = frame.getInsets().left;
+            final int top = frame.getInsets().top;
 
-        final ScreenPosition saveButtonPosition = new ScreenPosition(0, frame.getHeight() - top -
-                50);
-        final ActionButton saveButton = new ActionButton(saveButtonPosition, 100, 50, "Save",
-                Action.SAVE);
-        buttons.add(saveButton);
-        final ScreenPosition loadButtonPosition = new ScreenPosition(100,
-                frame.getHeight() - top - 50);
-        final ActionButton loadButton = new ActionButton(loadButtonPosition, 100, 50, "Load",
-                Action.LOAD);
-        buttons.add(loadButton);
-        final ScreenPosition resetButtonPosition = new ScreenPosition(200, frame.getHeight() -
-                top - 50);
-        final ActionButton resetButton = new ActionButton(resetButtonPosition, 100, 50, "Reset",
-                Action.RESET);
-        buttons.add(resetButton);
+            final ScreenPosition vertexButtonPosition = new ScreenPosition(frame.getWidth() - left -
+                    200, frame.getHeight() - top - 50);
+            final ModeButton vertexButton = new ModeButton(MouseMode.VERTEX, vertexButtonPosition,
+                    100, 50, "Vertex");
+            buttons.add(vertexButton);
+            //The vertex button starts out as the selected button
+            selectedButton = vertexButton;
+            vertexButton.setButtonState(ButtonState.SELECTED);
+            final ScreenPosition connectionButtonPosition = new ScreenPosition(
+                    frame.getWidth() - left -
+                            100, frame.getHeight() - top - 50);
+            final ModeButton connectionButton = new ModeButton(MouseMode.CONNECTION,
+                    connectionButtonPosition, 100, 50, "Connection");
+            buttons.add(connectionButton);
+            final ScreenPosition removeButtonPosition = new ScreenPosition(frame.getWidth() - left -
+                    300, frame.getHeight() - top - 50);
+            final ModeButton removeButton = new ModeButton(MouseMode.REMOVE, removeButtonPosition,
+                    100, 50, "Remove");
+            buttons.add(removeButton);
+
+            final ScreenPosition saveButtonPosition = new ScreenPosition(0, frame.getHeight() -
+                    top -
+                    50);
+            final ActionButton saveButton = new ActionButton(saveButtonPosition, 100, 50, "Save",
+                    Action.SAVE);
+            buttons.add(saveButton);
+            final ScreenPosition loadButtonPosition = new ScreenPosition(100,
+                    frame.getHeight() - top - 50);
+            final ActionButton loadButton = new ActionButton(loadButtonPosition, 100, 50, "Load",
+                    Action.LOAD);
+            buttons.add(loadButton);
+            final ScreenPosition resetButtonPosition = new ScreenPosition(200, frame.getHeight() -
+                    top - 50);
+            final ActionButton resetButton = new ActionButton(resetButtonPosition, 100, 50, "Reset",
+                    Action.RESET);
+            buttons.add(resetButton);
+        }
     }
 
     public void paintComponent(Graphics g) {
@@ -161,10 +167,12 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
         if (mode == MouseMode.VERTEX) {
             boolean drawGhost = true;
-            for (Button button : buttons) {
-                if (button.contains(new ScreenPosition(mouseX, mouseY))) {
-                    drawGhost = false;
-                    break;
+            synchronized (buttons) {
+                for (Button button : buttons) {
+                    if (button.contains(new ScreenPosition(mouseX, mouseY))) {
+                        drawGhost = false;
+                        break;
+                    }
                 }
             }
             for (Vertex vertex : graph.getVertices()) {
@@ -201,8 +209,10 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             g.drawString("Number of Cycles: " + graph.properties().numCycles(), 10, 200);
             g.drawString("Girth: " + graph.properties().getGirth(), 10, 220);
 
-            for (Button b : buttons) {
-                b.draw(g);
+            synchronized (buttons) {
+                for (Button b : buttons) {
+                    b.draw(g);
+                }
             }
 
             if (selectedVertex == null && infoNode != null) {
