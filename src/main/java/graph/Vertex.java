@@ -8,7 +8,9 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.geom.Rectangle2D;
+import java.awt.Rectangle;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
 import java.util.Set;
 
 /**
@@ -196,8 +198,8 @@ public class Vertex {
         // Draw the ID
         g.setColor(getContrastColor(graph.getColorManager().getColor(color)));
         g.setFont(new Font("Arial", Font.PLAIN, 10));
-        drawStringCentered(g, Integer.toString(id), x - radius + cX, y - radius + cY, radius * 2,
-                radius * 2);
+        drawStringCentered(g, Integer.toString(id), x - radius + cX, y - radius + cY, diameter,
+                diameter);
     }
 
     private static Color getContrastColor(Color color) {
@@ -207,11 +209,17 @@ public class Vertex {
 
     private static void drawStringCentered(Graphics g, String s, int x, int y, int width,
             int height) {
-        final Rectangle2D bds1 = g.getFont().createGlyphVector(
-                ((Graphics2D) g).getFontRenderContext(), s).getVisualBounds();
-        final int w = (int) bds1.getWidth();
-        final int h = (int) bds1.getHeight();
-        g.drawString(s, x + (width / 2 - w / 2), y + (height / 2 + h / 2));
+        final Rectangle stringBounds = getStringBounds((Graphics2D) g, s, x, y);
+        final int stringWidth = (int) stringBounds.getWidth();
+        final int stringHeight = (int) stringBounds.getHeight();
+        g.drawString(s, x + (width / 2 - stringWidth / 2) - 1,
+                y + (height / 2 + stringHeight / 2) + 1);
+    }
+
+    private static Rectangle getStringBounds(Graphics2D g2, String str, float x, float y) {
+        FontRenderContext frc = g2.getFontRenderContext();
+        GlyphVector gv = g2.getFont().createGlyphVector(frc, str);
+        return gv.getPixelBounds(null, x, y);
     }
 
     /**
