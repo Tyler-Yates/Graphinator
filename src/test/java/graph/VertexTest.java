@@ -11,10 +11,8 @@ import java.util.HashSet;
 
 import static org.junit.Assert.assertEquals;
 
-@SuppressWarnings("JavaDoc")
+@SuppressWarnings({"JavaDoc", "TestMethodWithIncorrectSignature"})
 public class VertexTest {
-
-    private Graph graph;
     private VertexManager vertexManager;
     private ConnectionManager connectionManager;
     private Vertex vertex1;
@@ -24,7 +22,7 @@ public class VertexTest {
 
     @Before
     public void init() {
-        graph = new Graph();
+        final Graph graph = new Graph();
         vertexManager = graph.getVertexManager();
         connectionManager = graph.getConnectionManager();
 

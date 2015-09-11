@@ -50,6 +50,9 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     private static final ArrayList<Button> buttons = new ArrayList<>();
     private static final Font drawFont = new Font("Arial", Font.BOLD, 16);
 
+    /**
+     * Constructs a new frame and sets the mouse mode.
+     */
     public Drawer() {
         frame = new JFrame("Graphinator v" + VERSION);
         frame.setVisible(true);
@@ -70,9 +73,15 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         });
         frame.add(this);
 
+        mode = MouseMode.VERTEX;
         CursorManager.setCursor(frame, MouseMode.VERTEX);
     }
 
+    /**
+     * Starts the Graphinator program.
+     *
+     * @param args program arguments
+     */
     public static void main(String args[]) {
         new Drawer();
         initButtons();
@@ -105,6 +114,10 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
         return infoNode;
     }
 
+    /**
+     * Initializes the mouse mode buttons. This must be called whenever the screen is resized in
+     * order to keep the buttons at the bottom of the window.
+     */
     public static void initButtons() {
         synchronized (buttons) {
             buttons.clear();

@@ -10,8 +10,8 @@ import java.util.Set;
  */
 public class Graph {
     private final ConnectionManager connectionManager = new ConnectionManager(this);
-    private final ConnectionVisualizer connectionVisualizer = new ConnectionVisualizer
-            (connectionManager);
+    private final ConnectionVisualizer connectionVisualizer = new ConnectionVisualizer(
+            connectionManager);
     private final VertexManager vertexManager = new VertexManager(this);
     private final VertexVisualizer vertexVisualizer = new VertexVisualizer(vertexManager);
     private final ColorManager colorManager = new ColorManager(this);
@@ -33,6 +33,11 @@ public class Graph {
         return colorManager;
     }
 
+    /**
+     * Returns the manager for the properties of the current graph.
+     *
+     * @return the properties manager for the current graph
+     */
     public PropertyManager properties() {
         return propertyManager;
     }

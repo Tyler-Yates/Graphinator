@@ -146,6 +146,9 @@ public class PropertyManager {
         return girth;
     }
 
+    /**
+     * Calculates all cycles in the current graph.
+     */
     public void calculateCycles() {
         cycles.clear();
         girth = 0;

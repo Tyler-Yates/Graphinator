@@ -8,6 +8,12 @@ import util.Position;
  */
 public class CanvasPosition extends Position {
 
+    /**
+     * Constructs a new canvas position at the given coordinates
+     *
+     * @param x the x coordinate
+     * @param y the y coordinate
+     */
     public CanvasPosition(int x, int y) {
         super(x, y);
     }
