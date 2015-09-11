@@ -4,7 +4,8 @@ import graph.CanvasPosition;
 import graph.Vertex;
 import visualization.Drawer;
 
-import javax.swing.*;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -21,7 +22,7 @@ public class FileOperations {
     /**
      * Saves the current graph to disk.
      *
-     * @throws IOException
+     * @throws IOException if there was an error creating the save file
      */
     public static void saveFile() throws IOException {
         final JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
@@ -29,10 +30,25 @@ public class FileOperations {
         if (option == JFileChooser.APPROVE_OPTION) {
             if (fileChooser.getSelectedFile() != null) {
                 final File theFileToSave = fileChooser.getSelectedFile();
-                theFileToSave.createNewFile();
+                final boolean fileDidNotExist = theFileToSave.createNewFile();
+                if (fileDidNotExist) {
+                    System.out.println("Creating new save file " + theFileToSave.getName());
+                } else {
+                    final int overwrite = JOptionPane.showConfirmDialog(null,
+                            "File already exists. Overwrite?", "Overwrite File",
+                            JOptionPane.YES_NO_OPTION);
+                    switch (overwrite) {
+                        case JOptionPane.YES_OPTION:
+                            System.out.println("Overwriting file " + theFileToSave.getName());
+                            break;
+                        default:
+                            System.out.println("Cancelling save");
+                            return;
+                    }
+                }
 
-                final PrintWriter printWriter = new PrintWriter(new BufferedOutputStream(
-                        new FileOutputStream(theFileToSave)));
+                final PrintWriter printWriter = new PrintWriter(
+                        new BufferedOutputStream(new FileOutputStream(theFileToSave)));
                 printWriter.println("# Lines beginning with '#' are ignored");
                 printWriter.println("# Number of Vertices:");
                 final Collection<Vertex> vertices = Drawer.getGraph().getVertices();
@@ -65,8 +81,8 @@ public class FileOperations {
     /**
      * Loads a graph from disk.
      *
-     * @throws IOException
-     * @throws MalformedGraphException
+     * @throws IOException if there was an error loading the file
+     * @throws MalformedGraphException if the graph in the file is invalid
      */
     public static void loadFile() throws IOException, MalformedGraphException {
         final JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
@@ -89,7 +105,8 @@ public class FileOperations {
                     }
 
                     // create each vertex from its definition
-                    while (Drawer.getGraph().getVertices().size() < numVertices && input.hasNext()) {
+                    while (Drawer.getGraph().getVertices().size() < numVertices && input.hasNext
+                            ()) {
                         final String line = input.nextLine();
                         if (!line.startsWith("#")) {
                             final String[] sections = line.split(" ");
@@ -122,8 +139,8 @@ public class FileOperations {
                             final Vertex vertex = Drawer.getGraph().getVertex(id);
                             if (vertex == null) {
                                 input.close();
-                                throw new MalformedGraphException("Invalid connection: vertex "
-                                        + "does not exist");
+                                throw new MalformedGraphException(
+                                        "Invalid connection: vertex " + "does not exist");
                             }
 
                             for (int i = 1; i < sections.length; i++) {
@@ -131,8 +148,8 @@ public class FileOperations {
                                 final Vertex otherVertex = Drawer.getGraph().getVertex(otherID);
                                 if (otherVertex == null) {
                                     input.close();
-                                    throw new MalformedGraphException("Invalid connection: "
-                                            + "vertex does not exist");
+                                    throw new MalformedGraphException(
+                                            "Invalid connection: " + "vertex does not exist");
                                 }
                                 Drawer.getGraph().addConnection(vertex, otherVertex);
                             }
