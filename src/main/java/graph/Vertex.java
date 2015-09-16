@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Represents a vertex in the graph.
  */
-public class Vertex {
+public class Vertex implements Comparable {
     private final int id;
     private final Graph graph;
 
@@ -311,5 +311,13 @@ public class Vertex {
 
     public String toString() {
         return "" + getID();
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (o instanceof Vertex) {
+            return Integer.compare(id, ((Vertex) o).id);
+        }
+        return -1;
     }
 }
