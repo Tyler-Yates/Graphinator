@@ -58,6 +58,10 @@ class ColorManager {
      * @return the color
      */
     Color getColor(int colorID) {
+        if (colorID < 0) {
+            return Color.BLACK;
+        }
+
         while (colors.size() <= colorID) {
             colors.add(generateColor());
         }
@@ -84,8 +88,12 @@ class ColorManager {
     }
 
     private void resetColors() {
+        setAllColors(-1);
+    }
+
+    private void setAllColors(int color) {
         for (final Vertex vertex : graph.getVertices()) {
-            vertex.setColor(0);
+            vertex.setColor(color);
         }
     }
 
@@ -94,28 +102,37 @@ class ColorManager {
      */
     void assignColors() {
         maximumColor = 0;
-        resetColors();
+
         if (graph.numberOfConnections() == 0) {
+            setAllColors(0);
             return;
         }
 
-        final Collection<List<Vertex>> vertexPermutations = Collections2.orderedPermutations(
-                graph.getVertices());
+        resetColors();
+        final Runnable colorRunnable = () -> {
+            System.out.println("Calculating permutations");
+            final Collection<List<Vertex>> vertexPermutations = Collections2.orderedPermutations(
+                    graph.getVertices());
 
-        int smallestColoring = Integer.MAX_VALUE;
-        ColorMap smallestColoringMap = null;
-        for (final List<Vertex> vertexOrdering : vertexPermutations) {
-            final ColorMap colorMap = getColorMap(vertexOrdering);
-            if (colorMap.getMaxColor() < smallestColoring) {
-                smallestColoring = colorMap.getMaxColor();
-                smallestColoringMap = colorMap;
+            int smallestColoring = Integer.MAX_VALUE;
+            ColorMap smallestColoringMap = null;
+            for (final List<Vertex> vertexOrdering : vertexPermutations) {
+                final ColorMap colorMap = getColorMap(vertexOrdering);
+                if (colorMap.getMaxColor() < smallestColoring) {
+                    smallestColoring = colorMap.getMaxColor();
+                    smallestColoringMap = colorMap;
+                }
             }
-        }
 
-        if (smallestColoringMap != null) {
-            smallestColoringMap.assignColors();
-            maximumColor = smallestColoringMap.getMaxColor();
-        }
+            if (smallestColoringMap != null) {
+                LOGGER.info("Optimal coloring found.");
+                smallestColoringMap.assignColors();
+                maximumColor = smallestColoringMap.getMaxColor();
+            }
+        };
+
+        final Thread colorThread = new Thread(colorRunnable);
+        colorThread.start();
     }
 
     private ColorMap getColorMap(List<Vertex> vertexOrdering) {
