@@ -30,7 +30,7 @@ public class CycleBuilder {
      * @return whether the given vertex was successfully added to the cycle
      */
     public boolean addVertex(Vertex vertex) {
-        LOGGER.debug("Attempting to add vertex " + vertex.getID());
+        //LOGGER.trace("Attempting to add vertex " + vertex.getID());
         if (isCycle) {
             print("The cycle is already complete. Cannot add another vertex.");
             return false;
@@ -62,7 +62,7 @@ public class CycleBuilder {
     }
 
     private void print(String message) {
-        LOGGER.info(vertices.toString() + " - " + message);
+        //LOGGER.trace(vertices.toString() + " - " + message);
     }
 
     /**
