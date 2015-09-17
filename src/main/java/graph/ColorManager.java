@@ -119,22 +119,22 @@ class ColorManager {
 
         LOGGER.info("Vertices that need color assigned: " + verticesWithoutColor);
 
-        final List<List<Vertex>> connectedComponents = new ArrayList<>();
+        final List<ConnectedComponent> connectedComponents = new ArrayList<>();
         while (!verticesWithoutColor.isEmpty()) {
             final Vertex startVertex = verticesWithoutColor.iterator().next();
-            final Set<Vertex> connectedComponent = calculateConnectedComponent(startVertex,
-                    new HashSet<>());
-            verticesWithoutColor.removeAll(connectedComponent);
+            final ConnectedComponent connectedComponent = ConnectedComponent.find(startVertex);
+            connectedComponents.add(connectedComponent);
 
-            final List<Vertex> connectedComponentList = new ArrayList<>();
-            connectedComponentList.addAll(connectedComponent);
-            connectedComponents.add(connectedComponentList);
+            for (final Vertex vertex : connectedComponent.getVertices()) {
+                vertex.uncolor();
+                verticesWithoutColor.remove(vertex);
+            }
         }
 
         final Runnable colorRunnable = () -> {
-            for (final List<Vertex> connectedComponent : connectedComponents) {
+            for (final ConnectedComponent connectedComponent : connectedComponents) {
                 final Collection<List<Vertex>> vertexPermutations = orderedPermutations(
-                        connectedComponent);
+                        connectedComponent.getVertices());
 
                 int smallestColoring = Integer.MAX_VALUE;
                 ColorMap smallestColoringMap = null;
@@ -165,18 +165,6 @@ class ColorManager {
             maxColor = Math.max(vertex.getColor(), maxColor);
         }
         return maxColor;
-    }
-
-    private Set<Vertex> calculateConnectedComponent(Vertex vertex, Set<Vertex> connectedComponent) {
-        connectedComponent.add(vertex);
-        for (final Vertex neighbor : vertex.getNeighbors()) {
-            if (!connectedComponent.contains(neighbor)) {
-                neighbor.uncolor();
-                connectedComponent.add(neighbor);
-                calculateConnectedComponent(neighbor, connectedComponent);
-            }
-        }
-        return connectedComponent;
     }
 
     private ColorMap getColorMap(List<Vertex> vertexOrdering) {
