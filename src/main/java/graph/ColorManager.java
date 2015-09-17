@@ -83,14 +83,25 @@ class ColorManager {
         return maximumColor + 1;
     }
 
+    private void resetColors() {
+        for (final Vertex vertex : graph.getVertices()) {
+            vertex.setColor(0);
+        }
+    }
+
     /**
      * Assigns colors to all of the vertices in the graph.
      */
     void assignColors() {
+        maximumColor = 0;
+        resetColors();
+        if (graph.numberOfConnections() == 0) {
+            return;
+        }
+
         final Collection<List<Vertex>> vertexPermutations = Collections2.orderedPermutations(
                 graph.getVertices());
 
-        maximumColor = 0;
         int smallestColoring = Integer.MAX_VALUE;
         ColorMap smallestColoringMap = null;
         for (final List<Vertex> vertexOrdering : vertexPermutations) {
