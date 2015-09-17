@@ -3,6 +3,7 @@ package graph;
 import com.google.common.collect.Collections2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import visualization.Graphinator;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -129,6 +130,7 @@ class ColorManager {
                 smallestColoringMap.assignColors();
                 maximumColor = smallestColoringMap.getMaxColor();
             }
+            Graphinator.redraw();
         };
 
         final Thread colorThread = new Thread(colorRunnable);

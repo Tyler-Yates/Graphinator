@@ -75,15 +75,6 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
         mode = MouseMode.VERTEX;
         CursorManager.setCursor(frame, MouseMode.VERTEX);
-    }
-
-    /**
-     * Starts the Graphinator program.
-     *
-     * @param args program arguments
-     */
-    public static void main(String args[]) {
-        new Drawer();
         initButtons();
     }
 
