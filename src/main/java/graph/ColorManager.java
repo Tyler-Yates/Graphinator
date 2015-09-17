@@ -1,6 +1,5 @@
 package graph;
 
-import com.google.common.collect.Collections2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import visualization.Graphinator;
@@ -14,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
+import static com.google.common.collect.Collections2.orderedPermutations;
 
 /**
  * Manages the vertex colorings. Colors are assigned a unique ID that starts at zero.
@@ -109,32 +110,73 @@ class ColorManager {
             return;
         }
 
-        resetColors();
-        final Runnable colorRunnable = () -> {
-            System.out.println("Calculating permutations");
-            final Collection<List<Vertex>> vertexPermutations = Collections2.orderedPermutations(
-                    graph.getVertices());
+        final Set<Vertex> verticesWithoutColor = new HashSet<>();
+        for (final Vertex vertex : graph.getVertices()) {
+            if (vertex.getColor() < 0) {
+                verticesWithoutColor.add(vertex);
+            }
+        }
 
-            int smallestColoring = Integer.MAX_VALUE;
-            ColorMap smallestColoringMap = null;
-            for (final List<Vertex> vertexOrdering : vertexPermutations) {
-                final ColorMap colorMap = getColorMap(vertexOrdering);
-                if (colorMap.getMaxColor() < smallestColoring) {
-                    smallestColoring = colorMap.getMaxColor();
-                    smallestColoringMap = colorMap;
+        LOGGER.info("Vertices that need color assigned: " + verticesWithoutColor);
+
+        final List<List<Vertex>> connectedComponents = new ArrayList<>();
+        while (!verticesWithoutColor.isEmpty()) {
+            final Vertex startVertex = verticesWithoutColor.iterator().next();
+            final Set<Vertex> connectedComponent = calculateConnectedComponent(startVertex,
+                    new HashSet<>());
+            verticesWithoutColor.removeAll(connectedComponent);
+
+            final List<Vertex> connectedComponentList = new ArrayList<>();
+            connectedComponentList.addAll(connectedComponent);
+            connectedComponents.add(connectedComponentList);
+        }
+
+        final Runnable colorRunnable = () -> {
+            for (final List<Vertex> connectedComponent : connectedComponents) {
+                final Collection<List<Vertex>> vertexPermutations = orderedPermutations(
+                        connectedComponent);
+
+                int smallestColoring = Integer.MAX_VALUE;
+                ColorMap smallestColoringMap = null;
+                for (final List<Vertex> vertexOrdering : vertexPermutations) {
+                    final ColorMap colorMap = getColorMap(vertexOrdering);
+                    if (colorMap.getMaxColor() < smallestColoring) {
+                        smallestColoring = colorMap.getMaxColor();
+                        smallestColoringMap = colorMap;
+                    }
+                }
+
+                if (smallestColoringMap != null) {
+                    smallestColoringMap.assignColors();
                 }
             }
 
-            if (smallestColoringMap != null) {
-                LOGGER.info("Optimal coloring found.");
-                smallestColoringMap.assignColors();
-                maximumColor = smallestColoringMap.getMaxColor();
-            }
+            maximumColor = calculateMaximumColor();
             Graphinator.redraw();
         };
 
         final Thread colorThread = new Thread(colorRunnable);
         colorThread.start();
+    }
+
+    private int calculateMaximumColor() {
+        int maxColor = 0;
+        for (final Vertex vertex : graph.getVertices()) {
+            maxColor = Math.max(vertex.getColor(), maxColor);
+        }
+        return maxColor;
+    }
+
+    private Set<Vertex> calculateConnectedComponent(Vertex vertex, Set<Vertex> connectedComponent) {
+        connectedComponent.add(vertex);
+        for (final Vertex neighbor : vertex.getNeighbors()) {
+            if (!connectedComponent.contains(neighbor)) {
+                neighbor.uncolor();
+                connectedComponent.add(neighbor);
+                calculateConnectedComponent(neighbor, connectedComponent);
+            }
+        }
+        return connectedComponent;
     }
 
     private ColorMap getColorMap(List<Vertex> vertexOrdering) {

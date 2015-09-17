@@ -46,6 +46,8 @@ class ConnectionManager {
             addConnection(start, end);
         }
 
+        start.uncolor();
+        end.uncolor();
         graph.structurallyChanged();
     }
 
@@ -59,6 +61,8 @@ class ConnectionManager {
     void addConnection(Vertex start, Vertex end) {
         connections.add(new Connection(start, end));
 
+        start.uncolor();
+        end.uncolor();
         graph.structurallyChanged();
     }
 
@@ -78,6 +82,8 @@ class ConnectionManager {
      * @param connection the connection
      */
     void removeConnection(Connection connection) {
+        connection.getStart().uncolor();
+        connection.getEnd().uncolor();
         connections.remove(connection);
         graph.structurallyChanged();
     }
@@ -96,7 +102,7 @@ class ConnectionManager {
             }
         }
         for (Connection connection : connectionsToRemove) {
-            connections.remove(connection);
+            removeConnection(connection);
         }
 
         graph.structurallyChanged();
