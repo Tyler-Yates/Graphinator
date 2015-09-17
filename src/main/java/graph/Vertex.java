@@ -20,7 +20,7 @@ public class Vertex implements Comparable {
     private final int id;
     private final Graph graph;
 
-    private int color = 0;
+    private int color = -1;
     private int x, y;
     private boolean selected;
 
@@ -57,6 +57,13 @@ public class Vertex implements Comparable {
      */
     public int getColor() {
         return color;
+    }
+
+    /**
+     * Uncolors the current vertex such that it has no color assigned to it.
+     */
+    public void uncolor() {
+        color = -1;
     }
 
     /**
