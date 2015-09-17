@@ -293,7 +293,7 @@ public class Vertex implements Comparable {
      *
      * @return the distance between this vertex and the given position
      */
-    private double distance(CanvasPosition position) {
+    public double distance(CanvasPosition position) {
         final Point vertex = new Point(x, y);
         final Point mouse = new Point(position.getX(), position.getY());
         return vertex.distance(mouse);

@@ -30,6 +30,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
     private static final double VERSION = 0.1;
 
+    private static final double CONNECTION_LENIENCY = 30.0;
+
     private static JFrame frame;
     private static Graph graph = new Graph();
     private static Vertex selectedVertex = null;
@@ -380,6 +382,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                 } else if (mode == MouseMode.CONNECTION) {
                     // If we were dragging a connection from a vertex
                     if (selectedVertex != null) {
+                        double closestDistance = CONNECTION_LENIENCY;
+                        Vertex closestVertex = null;
                         for (Vertex vertex : graph.getVertices()) {
                             // Skip the selected vertex as we don't want to have self-loops
                             if (vertex.equals(selectedVertex)) {
@@ -387,19 +391,21 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                             }
                             // If the cursor is within the vertex toggle a connection
                             if (vertex.pointInVertex(getCanvasPosition(e))) {
-                                graph.toggleConnection(selectedVertex, vertex);
-                                //TODO do not perform this for directed graphs
-                                graph.toggleConnection(vertex, selectedVertex);
-
-                                selectedVertex = null;
-                                graph.removeHighlights();
-                                repaint();
+                                connectVertices(selectedVertex, vertex);
                                 return;
+                            } else {
+                                final double distance = vertex.distance(getCanvasPosition(e));
+                                if (distance < closestDistance) {
+                                    closestDistance = distance;
+                                    closestVertex = vertex;
+                                }
                             }
                         }
-                        // If there is no vertex to create the connection with terminate the
-                        // connection
-                        if (selectedVertex != null) {
+
+                        if (closestVertex != null) {
+                            connectVertices(selectedVertex, closestVertex);
+                            return;
+                        } else {
                             selectedVertex.deselect();
                             selectedVertex = null;
                         }
@@ -424,6 +430,16 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             }
         }
 
+        repaint();
+    }
+
+    private void connectVertices(Vertex start, Vertex end) {
+        graph.toggleConnection(start, end);
+        //TODO do not perform this for directed graphs
+        graph.toggleConnection(end, start);
+
+        selectedVertex = null;
+        graph.removeHighlights();
         repaint();
     }
 
