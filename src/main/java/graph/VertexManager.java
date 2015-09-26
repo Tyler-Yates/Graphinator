@@ -61,7 +61,7 @@ class VertexManager {
      */
     Vertex createVertex(int id, CanvasPosition position) {
         final Vertex newVertex = new Vertex(id, position, graph);
-        graph.structurallyChanged();
+        graph.structurallyChanged(newVertex);
         return vertices.put(id, newVertex);
     }
 
@@ -91,7 +91,6 @@ class VertexManager {
     void removeVertex(Vertex vertexToRemove) {
         graph.getConnectionManager().removeVertex(vertexToRemove);
         vertices.remove(vertexToRemove.getID());
-        graph.structurallyChanged();
     }
 
     /**

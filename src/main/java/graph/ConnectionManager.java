@@ -46,9 +46,7 @@ class ConnectionManager {
             addConnection(start, end);
         }
 
-        start.uncolor();
-        end.uncolor();
-        graph.structurallyChanged();
+        graph.structurallyChanged(start, end);
     }
 
     /**
@@ -61,9 +59,7 @@ class ConnectionManager {
     void addConnection(Vertex start, Vertex end) {
         connections.add(new Connection(start, end));
 
-        start.uncolor();
-        end.uncolor();
-        graph.structurallyChanged();
+        graph.structurallyChanged(start, end);
     }
 
     /**
@@ -82,10 +78,9 @@ class ConnectionManager {
      * @param connection the connection
      */
     void removeConnection(Connection connection) {
-        connection.getStart().uncolor();
-        connection.getEnd().uncolor();
         connections.remove(connection);
-        graph.structurallyChanged();
+
+        graph.structurallyChanged(connection.getStart(), connection.getEnd());
     }
 
     /**
@@ -94,6 +89,8 @@ class ConnectionManager {
      * @param removed the vertex to remove connections both from and to
      */
     void removeVertex(Vertex removed) {
+        graph.structurallyChanged(removed.getNeighbors());
+
         // Enumerate the connections to remove to prevent concurrent modification
         final Set<Connection> connectionsToRemove = new HashSet<>();
         for (Connection connection : connections) {
@@ -104,8 +101,6 @@ class ConnectionManager {
         for (Connection connection : connectionsToRemove) {
             removeConnection(connection);
         }
-
-        graph.structurallyChanged();
     }
 
     /**
@@ -119,8 +114,8 @@ class ConnectionManager {
 
     /**
      * Returns the neighbors of the given vertex. If the vertex has no neighbors an empty set will
-     * be returned. The neighbors of a vertex are all the vertices that are endpoints of
-     * connections originating from the vertex.
+     * be returned. The neighbors of a vertex are all the vertices that are endpoints of connections
+     * originating from the vertex.
      *
      * @param start the starting vertex
      *

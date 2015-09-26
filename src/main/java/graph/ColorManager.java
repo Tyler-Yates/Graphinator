@@ -103,9 +103,9 @@ class ColorManager {
     }
 
     /**
-     * Assigns colors to all of the vertices in the graph.
+     * Assigns colors to the affected parts of the graph.
      */
-    void assignColors() {
+    void assignColors(StructuralChange structuralChange) {
         maximumColor = 0;
 
         if (graph.numberOfConnections() == 0) {
@@ -113,28 +113,26 @@ class ColorManager {
             return;
         }
 
-        final Set<Vertex> verticesWithoutColor = new HashSet<>();
-        for (final Vertex vertex : graph.getVertices()) {
-            if (vertex.getColor() < 0) {
-                verticesWithoutColor.add(vertex);
-            }
-        }
-
-        LOGGER.info("Vertices that need color assigned: " + verticesWithoutColor);
-
-        final List<ConnectedComponent> connectedComponents = new ArrayList<>();
-        while (!verticesWithoutColor.isEmpty()) {
-            final Vertex startVertex = verticesWithoutColor.iterator().next();
-            final ConnectedComponent connectedComponent = ConnectedComponent.find(startVertex);
-            connectedComponents.add(connectedComponent);
-
-            for (final Vertex vertex : connectedComponent.getVertices()) {
-                vertex.uncolor();
-                verticesWithoutColor.remove(vertex);
-            }
-        }
-
         final Runnable colorRunnable = () -> {
+            final Set<Vertex> changedVertices = new HashSet<>();
+            changedVertices.addAll(structuralChange.getVerticesChanged());
+
+            LOGGER.info("Changed vertices: " + changedVertices);
+
+            final List<ConnectedComponent> connectedComponents = new ArrayList<>();
+            while (!changedVertices.isEmpty()) {
+                final Vertex startVertex = changedVertices.iterator().next();
+                final ConnectedComponent connectedComponent = ConnectedComponent.find(startVertex);
+                connectedComponents.add(connectedComponent);
+
+                for (final Vertex vertex : connectedComponent.getVertices()) {
+                    vertex.uncolor();
+                    changedVertices.remove(vertex);
+                }
+            }
+
+            Graphinator.redraw();
+
             for (final ConnectedComponent connectedComponent : connectedComponents) {
                 final Collection<List<Vertex>> vertexPermutations = orderedPermutations(
                         connectedComponent.getVertices());

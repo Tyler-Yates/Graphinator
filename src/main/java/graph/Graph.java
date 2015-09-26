@@ -3,6 +3,8 @@ package graph;
 import java.awt.Graphics;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -17,7 +19,7 @@ public class Graph {
     private final ColorManager colorManager = new ColorManager(this);
     private final PropertyManager propertyManager = new PropertyManager(this);
 
-    private boolean structureChanged = false;
+    private final Queue<StructuralChange> structuralChanges = new LinkedList<>();
 
     private static final double REMOVAL_DISTANCE = 5.0;
 
@@ -154,10 +156,21 @@ public class Graph {
     }
 
     /**
-     * Called by the manager classes to notify the graph that it has been modified structurally.
+     * Notify the graph that a structural change has occurred.
+     *
+     * @param verticesChanged the vertices that were changed
      */
-    void structurallyChanged() {
-        structureChanged = true;
+    void structurallyChanged(Vertex... verticesChanged) {
+        structuralChanges.add(new StructuralChange(verticesChanged));
+    }
+
+    /**
+     * Notify the graph that a structural change has occurred.
+     *
+     * @param verticesChanged the vertices that were changed
+     */
+    void structurallyChanged(Set<Vertex> verticesChanged) {
+        structuralChanges.add(new StructuralChange(verticesChanged));
     }
 
     /**
@@ -166,14 +179,14 @@ public class Graph {
      */
     private void checkForStructuralChanges() {
         // If the graph has been modified we need to update properties
-        if (structureChanged) {
+        while (!structuralChanges.isEmpty()) {
+            final StructuralChange structuralChange = structuralChanges.poll();
+
             // We need to reassign colors because the modified structure of the graph may cause a
             // new coloring
-            colorManager.assignColors();
+            colorManager.assignColors(structuralChange);
             propertyManager.calculateProperties();
         }
-
-        structureChanged = false;
     }
 
     /**
