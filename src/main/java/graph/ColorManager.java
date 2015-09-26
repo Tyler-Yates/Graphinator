@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.google.common.collect.Collections2.orderedPermutations;
 
@@ -26,6 +28,7 @@ class ColorManager {
 
     private final Random generator = new Random();
     private final List<Color> colors = new ArrayList<>();
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     private int maximumColor = -1;
 
@@ -151,12 +154,13 @@ class ColorManager {
                 }
             }
 
+            LOGGER.info("Finished color calculation");
+
             maximumColor = calculateMaximumColor();
             Graphinator.redraw();
         };
 
-        final Thread colorThread = new Thread(colorRunnable);
-        colorThread.start();
+        executorService.submit(colorRunnable);
     }
 
     private int calculateMaximumColor() {
