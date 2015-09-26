@@ -34,6 +34,7 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
     private static JFrame frame;
     private static Graph graph = new Graph();
+    private static PropertiesPanel propertiesPanel = new PropertiesPanel(graph);
     private static Vertex selectedVertex = null;
     private static Vertex infoNode = null;
     private static final InfoPanel infoPanel = new InfoPanel();
@@ -187,6 +188,9 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
                     break;
                 }
             }
+            if (propertiesPanel.getDrawingRectangle().contains(mouseX, mouseY)) {
+                drawGhost = false;
+            }
 
             if (drawGhost) {
                 Vertex.drawGhost(g, mouseX, mouseY);
@@ -195,25 +199,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
         if (graph != null) {
             graph.drawGraph(g, canvasX, canvasY);
-            g.setFont(new Font("Arial", Font.PLAIN, 12));
-            g.setColor(frame.getBackground());
-            g.fillRect(0, 0, 200, 230);
-            g.setColor(Color.LIGHT_GRAY);
-            g.drawLine(0, 230, 200, 230);
-            g.drawLine(200, 0, 200, 230);
-            g.setColor(Color.white);
-            g.drawString("Number of Vertices: " + graph.numberOfVertices(), 10, 20);
-            //TODO For directed graphs don't divide by two
-            g.drawString("Number of Connections: " + graph.numberOfConnections() / 2, 10, 40);
-            g.drawString("Number of Colors: " + graph.numberOfColors(), 10, 60);
-            g.drawString("Maximum Degree: " + graph.properties().getMaxDegree(), 10, 80);
-            g.drawString("Bipartite: " + graph.properties().isBipartite(), 10, 100);
-            g.drawString("Connected: " + graph.properties().isConnected(), 10, 120);
-            g.drawString("Tree: " + graph.properties().isTree(), 10, 140);
-            g.drawString("Regular: " + graph.properties().isRegular(), 10, 160);
-            g.drawString("Complete: " + graph.properties().isComplete(), 10, 180);
-            g.drawString("Number of Cycles: " + graph.properties().numCycles(), 10, 200);
-            g.drawString("Girth: " + graph.properties().getGirth(), 10, 220);
+
+            propertiesPanel.draw(g);
 
             synchronized (buttons) {
                 for (Button b : buttons) {
@@ -305,6 +292,13 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
     public void mousePressed(MouseEvent e) {
         updateMousePosition(e);
+
+        final ScreenPosition screenPosition = getScreenPosition(e);
+        // Don't allow interaction with the properties panel
+        if (propertiesPanel.getDrawingRectangle().contains(screenPosition.getX(), screenPosition
+                .getY())) {
+            return;
+        }
 
         // Left-mouse button
         if (e.getButton() == MouseEvent.BUTTON1) {
@@ -478,8 +472,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
     /**
      * Returns the position of the mouse represented by the given mouse event on the canvas. This
-     * position is affected by scrolling and is used by the graph to represent the true
-     * coordinates of vertices.
+     * position is affected by scrolling and is used by the graph to represent the true coordinates
+     * of vertices.
      *
      * @param e the mouse event
      *
