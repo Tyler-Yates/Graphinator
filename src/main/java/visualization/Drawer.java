@@ -8,20 +8,9 @@ import util.FileOperations;
 import util.MalformedGraphException;
 import util.MouseMode;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.WindowConstants;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -31,14 +20,14 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     private static final double VERSION = 0.1;
 
     private static final double CONNECTION_LENIENCY = 30.0;
-
+    private static final InfoPanel infoPanel = new InfoPanel();
+    private static final ArrayList<Button> buttons = new ArrayList<>();
+    private static final Font drawFont = new Font("Arial", Font.BOLD, 16);
     private static JFrame frame;
     private static Graph graph = new Graph();
     private static PropertiesPanel propertiesPanel = new PropertiesPanel(graph);
     private static Vertex selectedVertex = null;
     private static Vertex infoNode = null;
-    private static final InfoPanel infoPanel = new InfoPanel();
-
     private static boolean dragged = false;
     private static boolean draggingCanvas = false;
     private static long dragTimer = -1;
@@ -47,11 +36,8 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
     private static int originalCanvasX, originalCanvasY;
     private static int mouseX, mouseY;
     private static int originalMouseX, originalMouseY;
-
     private static MouseMode mode = MouseMode.VERTEX;
     private static Button selectedButton;
-    private static final ArrayList<Button> buttons = new ArrayList<>();
-    private static final Font drawFont = new Font("Arial", Font.BOLD, 16);
 
     /**
      * Constructs a new frame and sets the mouse mode.
@@ -157,6 +143,36 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
             final ActionButton resetButton = new ActionButton(resetButtonPosition, 100, 50, "Reset",
                     Action.RESET);
             buttons.add(resetButton);
+        }
+    }
+
+    /**
+     * Sets the mouse mode of the program.
+     *
+     * @param mode the mouse mode
+     */
+    public static void setMouseMode(MouseMode mode) {
+        Drawer.mode = mode;
+    }
+
+    /**
+     * Resets the graph by removing all vertices and connections.
+     */
+    public static void reset() {
+        final int response = JOptionPane.showConfirmDialog(null,
+                "Do you want to reset the graph? This action is not undoable.", "Confirm Reset",
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+        if (response == JOptionPane.YES_OPTION) {
+            graph = new Graph();
+            propertiesPanel = new PropertiesPanel(graph);
+            infoNode = null;
+            selectedVertex = null;
+
+            canvasX = 0;
+            canvasY = 0;
+            dragged = false;
+            draggingCanvas = false;
         }
     }
 
@@ -511,35 +527,6 @@ public class Drawer extends JPanel implements MouseMotionListener, MouseListener
 
         mouseX = screenPosition.getX();
         mouseY = screenPosition.getY();
-    }
-
-    /**
-     * Sets the mouse mode of the program.
-     *
-     * @param mode the mouse mode
-     */
-    public static void setMouseMode(MouseMode mode) {
-        Drawer.mode = mode;
-    }
-
-    /**
-     * Resets the graph by removing all vertices and connections.
-     */
-    public static void reset() {
-        final int response = JOptionPane.showConfirmDialog(null,
-                "Do you want to reset the graph? This action is not undoable.", "Confirm Reset",
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-
-        if (response == JOptionPane.YES_OPTION) {
-            graph = new Graph();
-            infoNode = null;
-            selectedVertex = null;
-
-            canvasX = 0;
-            canvasY = 0;
-            dragged = false;
-            draggingCanvas = false;
-        }
     }
 
     @Override
